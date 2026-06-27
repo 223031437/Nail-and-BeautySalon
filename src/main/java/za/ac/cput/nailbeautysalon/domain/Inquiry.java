@@ -13,13 +13,13 @@ public class Inquiry {
     @Id
     private String email;
     private String fullName;
-    private int phoneNumber;
+    private String phoneNumber;
     private Subject subject;
     private String message;
 
-   /* @ManyToOne
+    @ManyToOne
     private Customer customer;
-    */
+
     protected Inquiry(){ }
 
     public Inquiry(Builder builder){
@@ -42,7 +42,7 @@ public class Inquiry {
         return fullName;
     }
 
-    public int getPhoneNumber() {
+    public String getPhoneNumber() {
         return phoneNumber;
     }
 
@@ -64,7 +64,7 @@ public class Inquiry {
     public static class Builder{
         private String email;
         private String fullName;
-        private int phoneNumber;
+        private String phoneNumber;
         private Subject subject;
         private String message;
 
@@ -72,7 +72,7 @@ public class Inquiry {
             return this;
         }
 
-        public Builder setPhoneNumber(int phoneNumber) {
+        public Builder setPhoneNumber(String phoneNumber) {
             this.phoneNumber = phoneNumber;
             return this;
         }

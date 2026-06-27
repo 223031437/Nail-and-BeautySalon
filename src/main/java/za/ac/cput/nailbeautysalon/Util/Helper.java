@@ -7,6 +7,11 @@ Date: 25 June 2026
 
 import org.apache.commons.validator.routines.EmailValidator;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.regex.Pattern;
+
 public class Helper {
     public static boolean isNullOrEmpty(String str){
         if ((str == null) || (str.isEmpty())){
@@ -33,4 +38,13 @@ public class Helper {
         }
         return true;
     }
+
+    public static boolean isValidMobile(String cell) {
+        Pattern MOBILE_PATTERN = Pattern.compile("^(\\+27|0)?[6-8][0-9]{8}$");
+        if (cell == null || cell.isEmpty()) {
+            return false;
+        }
+        return MOBILE_PATTERN.matcher(cell).matches();
+    }
+
 }

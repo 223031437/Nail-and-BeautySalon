@@ -7,14 +7,16 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 
+import java.time.LocalTime;
+
 @Entity
 public class Contact {
     @Id
     @OneToOne
     private Address address;
-    private int phone;
+    private String phone;
     private String email;
-    private int hours;
+    private LocalTime hours;
 
     protected Contact(){}
 
@@ -29,7 +31,7 @@ public class Contact {
         return address;
     }
 
-    public int getPhone() {
+    public String getPhone() {
         return phone;
     }
 
@@ -37,7 +39,7 @@ public class Contact {
         return email;
     }
 
-    public int getHours() {
+    public LocalTime getHours() {
         return hours;
     }
 
@@ -53,16 +55,16 @@ public class Contact {
 
     public static class Builder{
         private Address address;
-        private int phone;
+        private String phone;
         private String email;
-        private int hours;
+        private LocalTime hours;
 
         public Builder setAddress(Address address) {
             this.address = address;
             return this;
         }
 
-        public Builder setPhone(int phone) {
+        public Builder setPhone(String phone) {
             this.phone = phone;
             return this;
         }
@@ -72,7 +74,7 @@ public class Contact {
             return this;
         }
 
-        public Builder setHours(int hours) {
+        public Builder setHours(LocalTime hours) {
             this.hours = hours;
             return this;
         }
