@@ -2,7 +2,7 @@ package za.ac.cput.nailbeautysalon.domain;
 
 /* Appointment.java
 Appointment model class
-Author: Tshepiso Kekana (240264681)
+Author: Tshephiso Kekana (240264681)
 Date: 22 June 2026
 */
 
@@ -90,11 +90,11 @@ public static class Builder {
         return this;
     }
 
-    public Builder setDateTime(LocalDateTime dateTime) {
+    public Builder setLocalDateTime(LocalDateTime dateTime) {
         this.dateTime = dateTime;
         return this;
     }
-    public Builder SetAddress(Address address) {
+    public Builder setAddress(Address address) {
         this.address = address;
         return this;
     }
