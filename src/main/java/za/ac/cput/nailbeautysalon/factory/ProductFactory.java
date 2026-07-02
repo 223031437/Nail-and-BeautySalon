@@ -5,7 +5,7 @@ Student number: 222927402
 Date: 26 June 2026
 */
 
-import za.ac.cput.nailbeautysalon.Util.Helper;
+import za.ac.cput.nailbeautysalon.util.Helper;
 import za.ac.cput.nailbeautysalon.domain.Product;
 
 public class ProductFactory {

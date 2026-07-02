@@ -1,6 +1,6 @@
 package za.ac.cput.nailbeautysalon.factory;
 
-import za.ac.cput.nailbeautysalon.Util.Helper;
+import za.ac.cput.nailbeautysalon.util.Helper;
 import za.ac.cput.nailbeautysalon.domain.Address;
 
 /* AddressFactory.java

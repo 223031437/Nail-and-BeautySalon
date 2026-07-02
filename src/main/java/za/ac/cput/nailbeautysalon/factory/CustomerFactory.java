@@ -6,7 +6,7 @@ package za.ac.cput.nailbeautysalon.factory;
    Date: 28 June 2026
 */
 
-import za.ac.cput.nailbeautysalon.Util.Helper;
+import za.ac.cput.nailbeautysalon.util.Helper;
 import za.ac.cput.nailbeautysalon.domain.Customer;
 
 public class CustomerFactory {

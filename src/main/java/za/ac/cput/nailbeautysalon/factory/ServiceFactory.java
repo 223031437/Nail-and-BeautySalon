@@ -1,9 +1,9 @@
 package za.ac.cput.nailbeautysalon.factory;
 
-import za.ac.cput.nailbeautysalon.Util.Helper;
+import za.ac.cput.nailbeautysalon.util.Helper;
 import za.ac.cput.nailbeautysalon.domain.Service;
 
-import static za.ac.cput.nailbeautysalon.Util.Helper.isNullOrEmpty;
+import static za.ac.cput.nailbeautysalon.util.Helper.isNullOrEmpty;
 
 /**
  * author: Nandipha Galada

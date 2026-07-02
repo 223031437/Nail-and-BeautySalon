@@ -1,4 +1,4 @@
-package za.ac.cput.nailbeautysalon.Util;
+package za.ac.cput.nailbeautysalon.util;
 /* Helper.java
 Helper class
 Author: Vincent Kanzi(221188932)
@@ -7,9 +7,6 @@ Date: 25 June 2026
 
 import org.apache.commons.validator.routines.EmailValidator;
 
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.regex.Pattern;
 
 public class Helper {

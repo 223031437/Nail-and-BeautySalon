@@ -6,7 +6,7 @@ AppointmentFactory class
 Author: Tshephiso Kekana (240264681)
 Date: 22 June 2026
 */
-import za.ac.cput.nailbeautysalon.Util.Helper;
+import za.ac.cput.nailbeautysalon.util.Helper;
 import za.ac.cput.nailbeautysalon.domain.Address;
 import za.ac.cput.nailbeautysalon.domain.Appointment;
 

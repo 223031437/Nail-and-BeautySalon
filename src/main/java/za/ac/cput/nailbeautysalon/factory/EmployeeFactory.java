@@ -5,7 +5,7 @@ Author: Vincent Kanzi(221188932)
 Date: 25 June 2026
 */
 
-import za.ac.cput.nailbeautysalon.Util.Helper;
+import za.ac.cput.nailbeautysalon.util.Helper;
 import za.ac.cput.nailbeautysalon.domain.Employee;
 
 public class EmployeeFactory {

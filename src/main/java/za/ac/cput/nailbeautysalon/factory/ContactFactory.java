@@ -5,7 +5,7 @@ Author: Mbali Hlaba (223031437)
 Date: 26 June 2026
 */
 
-import za.ac.cput.nailbeautysalon.Util.Helper;
+import za.ac.cput.nailbeautysalon.util.Helper;
 import za.ac.cput.nailbeautysalon.domain.Address;
 import za.ac.cput.nailbeautysalon.domain.Contact;
 
