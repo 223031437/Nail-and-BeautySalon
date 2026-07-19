@@ -30,7 +30,7 @@ public class ServiceController {
         return this.service.create(service);
     }
 
-    @GetMapping("/{serviceId}")
+    @GetMapping("/read/{serviceId}")
     public Service read(@PathVariable String serviceId) {
         return this.service.read(serviceId);
     }
