@@ -1,15 +1,19 @@
+
 package za.ac.cput.nailbeautysalon.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Column;
 
 /* author: Confidence Khoza
    Student number: 222927402
  */
 @Entity
-public class Product{
+public class Product {
+
     @Id
     private int productID;
+
     private String productName;
     private String category;
     private double price;
@@ -19,7 +23,10 @@ public class Product{
     private String supplier;
     private String description;
 
-    public Product (){
+    @Column(name = "image_url")
+    private String imageUrl;
+
+    public Product() {
 
     }
 
@@ -33,6 +40,7 @@ public class Product{
         this.unitOfMeasure = builder.unitOfMeasure;
         this.supplier = builder.supplier;
         this.description = builder.description;
+        this.imageUrl = builder.imageUrl;
     }
 
     public int getProductID() {
@@ -71,22 +79,11 @@ public class Product{
         return description;
     }
 
-    public static class Builder {
+    public String getImageUrl() {
+        return imageUrl;
+    }
 
-        @Override
-        public String toString() {
-            return "Product{" +
-                    "productID=" + productID +
-                    ", productName='" + productName + '\'' +
-                    ", category='" + category + '\'' +
-                    ", price=" + price +
-                    ", quantityInStock=" + quantityInStock +
-                    ", lowStockThreshold=" + lowStockThreshold +
-                    ", unitOfMeasure='" + unitOfMeasure + '\'' +
-                    ", supplier='" + supplier + '\'' +
-                    ", description='" + description + '\'' +
-                    '}';
-        }
+    public static class Builder {
 
         private int productID;
         private String productName;
@@ -97,6 +94,7 @@ public class Product{
         private String unitOfMeasure;
         private String supplier;
         private String description;
+        private String imageUrl;
 
         public Builder setProductID(int productID) {
             this.productID = productID;
@@ -143,6 +141,11 @@ public class Product{
             return this;
         }
 
+        public Builder setImageUrl(String imageUrl) {
+            this.imageUrl = imageUrl;
+            return this;
+        }
+
         public Builder copy(Product product) {
             this.productID = product.productID;
             this.productName = product.productName;
@@ -153,7 +156,24 @@ public class Product{
             this.unitOfMeasure = product.unitOfMeasure;
             this.supplier = product.supplier;
             this.description = product.description;
+            this.imageUrl = product.imageUrl;
             return this;
+        }
+
+        @Override
+        public String toString() {
+            return "Product{" +
+                    "productID=" + productID +
+                    ", productName='" + productName + '\'' +
+                    ", category='" + category + '\'' +
+                    ", price=" + price +
+                    ", quantityInStock=" + quantityInStock +
+                    ", lowStockThreshold=" + lowStockThreshold +
+                    ", unitOfMeasure='" + unitOfMeasure + '\'' +
+                    ", supplier='" + supplier + '\'' +
+                    ", description='" + description + '\'' +
+                    ", imageUrl='" + imageUrl + '\'' +
+                    '}';
         }
 
         public Product build() {
