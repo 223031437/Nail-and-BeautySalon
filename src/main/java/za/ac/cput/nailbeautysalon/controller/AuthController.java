@@ -1,5 +1,6 @@
 package za.ac.cput.nailbeautysalon.controller;
 
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -8,27 +9,26 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.nailbeautysalon.domain.*;
 import za.ac.cput.nailbeautysalon.dto.*;
 import za.ac.cput.nailbeautysalon.repository.AccountRepository;
 import za.ac.cput.nailbeautysalon.repository.CustomerRepository;
 import za.ac.cput.nailbeautysalon.repository.EmployeeRepository;
-import za.ac.cput.nailbeautysalon.repository.AppointmentRepository;
-import za.ac.cput.nailbeautysalon.domain.Appointment;
-import java.util.List;
 import za.ac.cput.nailbeautysalon.security.JwtUtil;
+import za.ac.cput.nailbeautysalon.util.Helper;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-
-
 
     private static final Logger log = LoggerFactory.getLogger(AuthController.class);
 
@@ -38,30 +38,27 @@ public class AuthController {
     private final AccountRepository     accountRepository;
     private final CustomerRepository    customerRepository;
     private final EmployeeRepository    employeeRepository;
-    private final AppointmentRepository appointmentRepository;
 
     public AuthController(AuthenticationManager authenticationManager,
                           JwtUtil jwtUtil,
                           PasswordEncoder passwordEncoder,
                           AccountRepository accountRepository,
                           CustomerRepository customerRepository,
-                          EmployeeRepository employeeRepository,
-                          AppointmentRepository appointmentRepository) {
+                          EmployeeRepository employeeRepository) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil               = jwtUtil;
         this.passwordEncoder       = passwordEncoder;
         this.accountRepository     = accountRepository;
         this.customerRepository    = customerRepository;
         this.employeeRepository    = employeeRepository;
-        this.appointmentRepository = appointmentRepository;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
         try {
             Authentication auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            request.username().toLowerCase(),
+                            request.username().trim().toLowerCase(),
                             request.password()
                     )
             );
@@ -74,9 +71,11 @@ public class AuthController {
                     .orElse(null);
 
             log.info("Login OK: username={} role={}", account.getUsername(), role);
-            return ResponseEntity.ok(new LoginResponse(token, role, account.getUserId()));
+            return ResponseEntity.ok(new LoginResponse(token, role, account.getUserId(),
+                    displayName(account), account.getUsername()));
 
-        } catch (BadCredentialsException e) {
+        } catch (AuthenticationException e) {
+            // BadCredentialsException, UsernameNotFound (hidden as bad credentials), disabled, ...
             log.warn("Login FAILED for username={}", request.username());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("message", "Invalid email or password"));
@@ -84,8 +83,12 @@ public class AuthController {
     }
 
     @PostMapping("/register-customer")
-    public ResponseEntity<?> registerCustomer(@RequestBody RegisterCustomerRequest req) {
-        String email = req.email().toLowerCase();
+    @Transactional
+    public ResponseEntity<?> registerCustomer(@Valid @RequestBody RegisterCustomerRequest req) {
+        ResponseEntity<?> invalid = validateRegistration(req.email(), req.cellNumber());
+        if (invalid != null) return invalid;
+
+        String email = req.email().trim().toLowerCase();
 
         if (accountRepository.existsByUsername(email)) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
@@ -96,12 +99,12 @@ public class AuthController {
 
         // 1. Create Customer
         Customer customer = new Customer.Builder()
-                .setUserId(newId)        // <-- FIX: Hibernate requires this
+                .setUserId(newId)
                 .setCustomerId(newId)
-                .setFirstName(req.firstName())
-                .setLastName(req.lastName())
+                .setFirstName(req.firstName().trim())
+                .setLastName(req.lastName().trim())
                 .setEmail(email)
-                .setCellNumber(req.cellNumber())
+                .setCellNumber(req.cellNumber().trim())
                 .build();
         customerRepository.save(customer);
 
@@ -110,7 +113,7 @@ public class AuthController {
                 .setUsername(email)
                 .setPassword(passwordEncoder.encode(req.password()))
                 .setRole(Role.ROLE_CUSTOMER)
-                .setUserId(newId)        // <-- Linked to the generated ID
+                .setUserId(newId)
                 .build();
         accountRepository.save(account);
 
@@ -122,9 +125,14 @@ public class AuthController {
                 ));
     }
 
+    /** Admin only (see SecurityConfig). */
     @PostMapping("/register-employee")
-    public ResponseEntity<?> registerEmployee(@RequestBody RegisterEmployeeRequest req) {
-        String email = req.email().toLowerCase();
+    @Transactional
+    public ResponseEntity<?> registerEmployee(@Valid @RequestBody RegisterEmployeeRequest req) {
+        ResponseEntity<?> invalid = validateRegistration(req.email(), req.cellNumber());
+        if (invalid != null) return invalid;
+
+        String email = req.email().trim().toLowerCase();
 
         if (accountRepository.existsByUsername(email)) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
@@ -137,11 +145,11 @@ public class AuthController {
         Employee employee = new Employee.Builder()
                 .setUserId(newId)
                 .setEmployeeId(newId)
-                .setFirstName(req.firstName())
-                .setLastName(req.lastName())
+                .setFirstName(req.firstName().trim())
+                .setLastName(req.lastName().trim())
                 .setEmail(email)
-                .setCellNumber(req.cellNumber())
-                .setRole(req.employeeRole())
+                .setCellNumber(req.cellNumber().trim())
+                .setRole(req.employeeRole().trim())
                 .build();
         employeeRepository.save(employee);
 
@@ -162,22 +170,34 @@ public class AuthController {
                 ));
     }
 
-    @GetMapping("/customer/appointments")
-    public ResponseEntity<?> getMyAppointments(Authentication authentication) {
-        if (authentication == null || !(authentication.getPrincipal() instanceof Account)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Not logged in"));
+    /** Returns a 400 with per-field errors, or null when the e-mail and phone are fine. */
+    private ResponseEntity<?> validateRegistration(String email, String cell) {
+        Map<String, String> errors = new LinkedHashMap<>();
+        if (!Helper.isValidEmail(email.trim())) {
+            errors.put("email", "Please enter a valid email address");
         }
-
-        Account account = (Account) authentication.getPrincipal();
-        String customerId = account.getUserId();
-
-        // If the user is an admin (userId is null), return empty or error
-        if (customerId == null) {
-            return ResponseEntity.ok(List.of());
+        if (!Helper.isValidPhone(cell)) {
+            errors.put("cellNumber", "Please enter a valid cell number (9 to 15 digits)");
         }
+        if (errors.isEmpty()) {
+            return null;
+        }
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("message", "Please fix the following: " + String.join("; ", errors.values()));
+        body.put("errors", errors);
+        return ResponseEntity.badRequest().body(body);
+    }
 
-        //List<Appointment> appointments = appointmentRepository.findByCustomerId(customerId);
-        List<Appointment> appointments = appointmentRepository.findAll();
-        return ResponseEntity.ok(appointments);
+    private String displayName(Account account) {
+        String id = account.getUserId();
+        if (id == null) {
+            return "Admin";
+        }
+        if (account.getRole() == Role.ROLE_EMPLOYEE) {
+            return employeeRepository.findById(id)
+                    .map(e -> e.getFirstName() + " " + e.getLastName()).orElse("Employee");
+        }
+        return customerRepository.findById(id)
+                .map(c -> c.getFirstName() + " " + c.getLastName()).orElse("Customer");
     }
 }

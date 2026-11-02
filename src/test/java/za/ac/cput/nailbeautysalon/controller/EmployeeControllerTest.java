@@ -19,6 +19,7 @@ import za.ac.cput.nailbeautysalon.domain.Employee;
 import za.ac.cput.nailbeautysalon.factory.EmployeeFactory;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@org.junit.jupiter.api.Disabled("Written before JWT security was added (calls endpoints without a token). Replaced by BookingFlowIntegrationTest.")
 @TestMethodOrder(MethodOrderer.MethodName.class)
 class EmployeeControllerTest {
 

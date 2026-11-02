@@ -7,9 +7,7 @@ export const getAllEmployees = () => {
 };
 
 export const getEmployeeById = (userId) => {
-    return api.post(
-        `${BASE_URL}/read/${encodeURIComponent(userId)}`
-    );
+    return api.get(`${BASE_URL}/read/${encodeURIComponent(userId)}`);
 };
 
 export const createEmployee = (employee) => {
@@ -21,7 +19,5 @@ export const updateEmployee = (employee) => {
 };
 
 export const deleteEmployee = (userId) => {
-    return api.delete(
-        `${BASE_URL}/delete/${encodeURIComponent(userId)}`
-    );
+    return api.delete(`${BASE_URL}/delete/${encodeURIComponent(userId)}`);
 };

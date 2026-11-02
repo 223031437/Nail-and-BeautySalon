@@ -1,14 +1,6 @@
-﻿import api from '../services/api';
+import { createBooking } from '../services/bookingService';
 
+// Kept so existing imports keep working - this now talks to the real backend.
 export const appointmentsApi = {
-  create: async (appointment) => {
-    // Send the real request to Spring Boot
-    const response = await api.post('/appointment/book', appointment);
-    return response.data;
-  },
-  getMyAppointments: async () => {
-    // We will use this for the dashboard
-    const response = await api.get('/appointment/my-appointments');
-    return response.data;
-  }
+  create: (appointment) => createBooking(appointment),
 };

@@ -11,7 +11,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import za.ac.cput.nailbeautysalon.domain.Service;
 
+import java.util.List;
+
 @Repository
 public interface ServiceRepository extends JpaRepository<Service, String> {
-
+    List<Service> findByServiceNameIgnoreCase(String serviceName);
 }

@@ -1,0 +1,306 @@
+/* =========================================================================
+   Additions for the booking / dashboard features.
+   Nothing in index.css was changed - these rules only add styling for new
+   elements (field errors, time-slot buttons, dashboard tables, badges ...)
+   using the salon's existing gold / dark / cream palette.
+   ========================================================================= */
+
+/* ---------- messages & validation ---------- */
+.field-error {
+    display: block;
+    margin-top: 6px;
+    color: #c0392b;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+
+
+.notice {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+    line-height: 1.45;
+}
+
+.notice-success { background: #e8f5ec; color: #1e6b3a; border: 1px solid #b9e0c5; }
+.notice-error   { background: #fdecea; color: #a12a1f; border: 1px solid #f3c1bb; }
+.notice-info    { background: #f3f1ea; color: #4a463c; border: 1px solid #ddd9d2; }
+.notice a { color: inherit; font-weight: 600; text-decoration: underline; }
+
+.form-message {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+.form-message.success { background: #e8f5ec; color: #1e6b3a; border: 1px solid #b9e0c5; }
+.form-message.error   { background: #fdecea; color: #a12a1f; border: 1px solid #f3c1bb; }
+
+.contact-form select {
+    border: 1px solid #d2d2cb;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 16px;
+    background: #f9f9f7;
+    color: #1f2a2e;
+    outline: none;
+}
+.contact-form select:focus { border-color: #d58b0a; }
+.contact-form .field-error { margin-top: 6px; }
+
+.submit-btn:disabled,
+.form-card .btn-primary:disabled,
+.dashboard-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Visible feedback on every clickable thing */
+button:not(:disabled),
+.btn:not(:disabled),
+.nav-icon { cursor: pointer; }
+button:focus-visible,
+.btn:focus-visible,
+.chip:focus-visible,
+.slot-button:focus-visible { outline: 2px solid #d4af37; outline-offset: 2px; }
+
+.btn-primary-small { cursor: pointer; }
+
+/* ---------- time-slot picker ---------- */
+.slot-picker input[type="date"] {
+    width: 100%;
+    max-width: 260px;
+    padding: 13px 15px;
+    border: 1px solid #ccc7be;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 15px;
+    background: #fff;
+    color: #24332d;
+}
+
+.slot-hint {
+    display: block;
+    margin-top: 8px;
+    color: #777;
+    font-size: 0.85rem;
+}
+
+.slot-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.slot-button {
+    position: relative;
+    padding: 11px 6px;
+    border: 1px solid #1d3028;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #1d3028;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+}
+.slot-button:hover:not(:disabled) { border-color: #b87920; background: #fbf5ea; }
+.slot-button.selected { background: #1d3028; color: #fff; border-color: #1d3028; }
+.slot-button.unavailable,
+.slot-button:disabled {
+    background: #efeeea;
+    color: #a3a099;
+    border-color: #dcd9d2;
+    text-decoration: line-through;
+    cursor: not-allowed;
+}
+.slot-tag {
+    display: block;
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    text-decoration: none;
+}
+
+/* ---------- dashboards (employee / admin / customer) ---------- */
+.customer-dashboard {
+    min-height: calc(100vh - 80px);
+    background: #fffaf7;
+    color: #3d3532;
+    padding: 70px 0;
+}
+
+.portal-nav { gap: 8px; flex-wrap: wrap; }
+.portal-nav .nav-link {
+    color: #1d3028;
+    border: 1px solid rgba(29, 48, 40, 0.35);
+    border-radius: 0;
+    padding: 8px 18px;
+    font-weight: 500;
+}
+.portal-nav .nav-link:hover { background: rgba(29, 48, 40, 0.08); color: #2b4a3d; }
+.portal-nav .nav-link.active { background: #1d3028; color: #ffffff; border-color: #1d3028; }
+
+.portal-section h2 { font-size: 1.8rem; font-weight: 500; margin-bottom: 6px; }
+.section-subtitle { color: #6b625c; margin-bottom: 24px; }
+
+.employee-dashboard .portal-section a,
+.customer-dashboard .portal-section a { color: #1d3028; }
+
+.status-msg {
+    padding: 10px 14px;
+    margin-bottom: 18px;
+    border-left: 4px solid;
+    background: #ffffff;
+}
+.status-msg.error   { border-color: #c0392b; color: #a12a1f; }
+.status-msg.success { border-color: #1e6b3a; color: #1e6b3a; }
+
+.danger-zone { border-color: rgba(229, 96, 79, 0.5); }
+
+.dashboard-card.p-4 p { min-height: 0; }
+.customer-dashboard .form-label { color: #3d3532; }
+.customer-dashboard .form-control {
+    background: #ffffff;
+    color: #3d3532;
+    border: 1px solid #ccc7be;
+    border-radius: 0;
+}
+.customer-dashboard .form-control:disabled { background: #f3eeea; color: #8a817a; }
+.customer-dashboard .form-control:focus { border-color: #1d3028; box-shadow: 0 0 0 0.2rem rgba(29, 48, 40, 0.2); }
+.customer-dashboard .form-text { color: #6b625c !important; }
+
+.booking-list { display: grid; gap: 18px; }
+.booking-card p { color: #6b625c; min-height: 0; margin-bottom: 8px; }
+.booking-card__head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+.booking-card h3 { margin-bottom: 4px; }
+.booking-ref { font-size: 0.85rem; color: #6b625c !important; }
+.message-body { white-space: pre-wrap; color: #3d3532 !important; }
+
+.reschedule-box {
+    margin-top: 16px;
+    padding: 16px;
+    border: 1px dashed rgba(29, 48, 40, 0.4);
+    background: #f7f1ec;
+}
+.reschedule-box p { color: #3d3532; }
+
+/* the slot picker sits on a dark background inside dashboards */
+.reschedule-box .slot-picker input[type="date"],
+.edit-row .slot-picker input[type="date"] {
+    background: #ffffff; color: #3d3532; border: 1px solid #ccc7be; border-radius: 0;
+    color-scheme: light;
+}
+.reschedule-box .slot-button,
+.edit-row .slot-button { background: #ffffff; color: #1d3028; border-color: #1d3028; border-radius: 0; }
+.reschedule-box .slot-button:hover:not(:disabled),
+.edit-row .slot-button:hover:not(:disabled) { background: #eaf0ec; }
+.reschedule-box .slot-button.selected,
+.edit-row .slot-button.selected { background: #1d3028; color: #ffffff; }
+.reschedule-box .slot-button.unavailable,
+.reschedule-box .slot-button:disabled,
+.edit-row .slot-button.unavailable,
+.edit-row .slot-button:disabled { background: #f3eeea; color: #a3a099; border-color: #ccc7be; }
+.reschedule-box .slot-hint, .edit-row .slot-hint { color: #6b625c; }
+
+.portal-textarea,
+.portal-search,
+.portal-form input {
+    width: 100%;
+    background: #ffffff;
+    color: #3d3532;
+    border: 1px solid #ccc7be;
+    padding: 10px 12px;
+    font-family: inherit;
+}
+.portal-textarea:focus,
+.portal-search:focus,
+.portal-form input:focus { outline: none; border-color: #1d3028; }
+.portal-form label { display: block; margin-bottom: 4px; color: #6b625c; font-size: 0.9rem; }
+.portal-form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.radio-label { color: #3d3532; cursor: pointer; }
+
+.portal-toolbar {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+.portal-search { max-width: 340px; flex: 1 1 220px; }
+
+.chip {
+    background: transparent;
+    color: #1d3028;
+    border: 1px solid rgba(29, 48, 40, 0.4);
+    padding: 6px 16px;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+}
+.chip:hover { background: rgba(29, 48, 40, 0.08); }
+.chip.active { background: #1d3028; color: #ffffff; border-color: #1d3028; }
+
+.portal-table-wrap { overflow-x: auto; border: 1px solid rgba(29, 48, 40, 0.18); }
+.portal-table { width: 100%; border-collapse: collapse; background: #ffffff; color: #3d3532; }
+.portal-table th {
+    text-align: left;
+    padding: 12px 14px;
+    color: #1d3028;
+    font-weight: 600;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(29, 48, 40, 0.25);
+    white-space: nowrap;
+}
+.portal-table td { padding: 12px 14px; border-bottom: 1px solid #e5ded8; vertical-align: top; }
+.portal-table small { color: #6b625c; }
+.portal-table .edit-row td { background: #f7f1ec; }
+
+.badge-status {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: #ccc7be;
+    color: #3d3532;
+    white-space: nowrap;
+}
+.badge-status.status-confirmed,
+.badge-status.status-paid,
+.badge-status.status-responded { background: #1e6b3a; color: #ffffff; }
+.badge-status.status-completed,
+.badge-status.status-refunded { background: #36527a; color: #ffffff; }
+.badge-status.status-pending,
+.badge-status.status-new,
+.badge-status.status-refund-due { background: #b87920; color: #ffffff; }
+.badge-status.status-cancelled { background: #7a2a22; color: #ffffff; }
+
+/* ---------- small screens ---------- */
+@media (max-width: 768px) {
+    .dashboard-header { flex-direction: column; align-items: flex-start; gap: 18px; }
+    .dashboard-header h1 { font-size: 1.8rem; }
+    .employee-dashboard, .customer-dashboard { padding: 40px 0; }
+
+    /* tables become stacked cards */
+    .portal-table thead { display: none; }
+    .portal-table, .portal-table tbody, .portal-table tr, .portal-table td { display: block; width: 100%; }
+    .portal-table tr { border-bottom: 2px solid #ccc7be; padding: 8px 0; }
+    .portal-table td { border: 0; padding: 6px 14px; }
+    .portal-table td[data-label]::before {
+        content: attr(data-label);
+        display: block;
+        color: #1d3028;
+        font-size: 0.7rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+    .portal-toolbar { align-items: stretch; }
+    .portal-search { max-width: none; }
+    .slot-grid { grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); }
+}

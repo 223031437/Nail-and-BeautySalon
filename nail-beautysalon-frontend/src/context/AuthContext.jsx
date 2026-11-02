@@ -9,24 +9,34 @@ export function AuthProvider({ children }) {
 
     // On page load, check if user is already logged in
     useEffect(() => {
-        const storedUser = localStorage.getItem('user');
-        const token = localStorage.getItem('token');
-        if (storedUser && token) {
-            setUser(JSON.parse(storedUser));
+        try {
+            const storedUser = localStorage.getItem('user');
+            const token = localStorage.getItem('token');
+            if (storedUser && token) {
+                setUser(JSON.parse(storedUser));
+            }
+        } catch {
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
         }
         setLoading(false);
     }, []);
 
     const login = async (username, password) => {
-        const data = await authService.login(username, password);
-        
-        // data = { token, role, userId }
-        const userData = { username, role: data.role, userId: data.userId };
-        
+        const data = await authService.login(username.trim(), password);
+
+        // data = { token, role, userId, name, email }
+        const userData = {
+            username: data.email || username,
+            name: data.name,
+            role: data.role,
+            userId: data.userId,
+        };
+
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(userData));
         setUser(userData);
-        
+
         return userData;
     };
 
@@ -45,4 +55,5 @@ export function AuthProvider({ children }) {
     );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => useContext(AuthContext);

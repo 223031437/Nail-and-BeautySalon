@@ -1,0 +1,329 @@
+/* =========================================================================
+   Theme alignment (loaded last):
+   - one light cream background everywhere (no black / dark-mode pages)
+   - footer uses the same colour as the header
+   - every button uses the site's green (#1d3028)
+   ========================================================================= */
+
+:root,
+:root:root {
+    color-scheme: light;
+    --bg: #fffaf7;
+    --text: #3d3532;
+    --text-h: #292321;
+    --border: #e5ded8;
+    --code-bg: #f3eeea;
+    --site-green: #1d3028;
+    --site-green-hover: #2b4a3d;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg: #fffaf7;
+        --text: #3d3532;
+        --text-h: #292321;
+        --border: #e5ded8;
+        --code-bg: #f3eeea;
+    }
+}
+
+body { background: #fffaf7; color: #3d3532; }
+
+/* ---------- hero: green tint instead of black ---------- */
+.hero-section {
+    background:
+        linear-gradient(90deg, rgba(29, 48, 40, 0.92) 0%, rgba(29, 48, 40, 0.68) 50%, rgba(29, 48, 40, 0.2) 100%),
+        url('/Background.jpg') center / cover no-repeat;
+}
+.hero-eyebrow { color: #f3e3dc; }
+
+/* ---------- footer matches the header ---------- */
+.salon-footer {
+    background-color: #fffaf7;
+    color: #3d3532;
+    border-top: 1px solid #e5ded8;
+}
+.footer-brand { color: #8f675b; }
+.salon-footer p { color: #6b625c; }
+.salon-footer h5 { color: #1d3028; }
+.salon-footer a { color: #6b625c; }
+.salon-footer a:hover { color: #1d3028; text-decoration: underline; }
+.footer-bottom { border-top: 1px solid #e5ded8; }
+
+/* ---------- employee / admin / customer dashboards: light ---------- */
+.employee-dashboard,
+.customer-dashboard { background: #fffaf7; color: #3d3532; }
+.dashboard-eyebrow { color: #8f675b; }
+.dashboard-header h1 { color: #292321; }
+.dashboard-header p { color: #6b625c; }
+.dashboard-card {
+    background: #ffffff;
+    color: #3d3532;
+    border: 1px solid #ddd9d2;
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(29, 48, 40, 0.06);
+}
+.dashboard-card h3 { color: #1d3028; }
+.dashboard-card p { color: #6b625c; }
+.portal-table-wrap { border-radius: 12px; }
+
+/* ---------- GREEN BUTTONS ---------- */
+.primary-button,
+.dashboard-button,
+.logout-button,
+.submit-btn,
+.auth-button,
+.add-cart-button,
+.view-details-button,
+.cart-button,
+.book-icon,
+.service-action button,
+.book-service-button,
+.back-service-button,
+.form-card .btn-primary,
+.service-form form > button,
+.service-form form > button[type="button"],
+.service-list td:last-child button,
+.nav-logout,
+.btn-primary,
+.btn-success {
+    background: #1d3028 !important;
+    border: 1px solid #1d3028 !important;
+    color: #ffffff !important;
+}
+
+.primary-button:hover,
+.dashboard-button:hover,
+.logout-button:hover,
+.submit-btn:hover,
+.auth-button:hover,
+.add-cart-button:hover:not(:disabled),
+.view-details-button:hover,
+.cart-button:hover,
+.book-icon:hover,
+.service-action button:hover,
+.book-service-button:hover,
+.back-service-button:hover,
+.form-card .btn-primary:hover,
+.service-form form > button:hover,
+.service-list td:last-child button:hover,
+.nav-logout:hover,
+.btn-primary:hover,
+.btn-success:hover {
+    background: #2b4a3d !important;
+    border-color: #2b4a3d !important;
+    color: #ffffff !important;
+}
+
+/* secondary / outline buttons: green outline, fill green on hover */
+.secondary-button,
+.cart-button--outline,
+.btn-outline-secondary,
+.btn-outline-light,
+.btn-outline-success {
+    background: #ffffff !important;
+    border: 1px solid #1d3028 !important;
+    color: #1d3028 !important;
+}
+.secondary-button:hover,
+.cart-button--outline:hover,
+.btn-outline-secondary:hover,
+.btn-outline-light:hover,
+.btn-outline-success:hover {
+    background: #1d3028 !important;
+    color: #ffffff !important;
+}
+/* destructive actions stay recognisable but use the same shape */
+.btn-outline-danger { border-color: #1d3028 !important; color: #1d3028 !important; background: #fff !important; }
+.btn-outline-danger:hover { background: #7a2a22 !important; border-color: #7a2a22 !important; color: #fff !important; }
+.btn-danger { background: #7a2a22 !important; border-color: #7a2a22 !important; color: #fff !important; }
+
+button:disabled, .btn:disabled, .add-cart-button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+/* nav icons */
+.login-icon { color: #1d3028; border: 1px solid #1d3028; }
+.login-icon:hover { background: #1d3028; color: #fff; }
+.cart-icon {
+    position: relative;
+    background: #1d3028;
+    color: #ffffff;
+}
+.cart-icon:hover { background: #2b4a3d; color: #fff; }
+.cart-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
+    border-radius: 10px;
+    background: #b87920;
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    line-height: 20px;
+    text-align: center;
+}
+.nav-logout {
+    padding: 8px 16px;
+    border-radius: 21px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+.salon-navbar .nav-link { cursor: pointer; }
+
+/* ---------- product page extras (cart message, buttons, details pop-up) ---------- */
+.add-cart-button,
+.view-details-button {
+    display: block;
+    width: 100%;
+    margin-top: 12px;
+    padding: 11px 20px;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+}
+.view-details-button {
+    background: #ffffff !important;
+    color: #1d3028 !important;
+}
+.view-details-button:hover { background: #1d3028 !important; color: #fff !important; }
+
+.cart-message {
+    max-width: 640px;
+    margin: 0 auto 30px;
+    padding: 12px 18px;
+    border-radius: 8px;
+    background: #e8f5ec;
+    color: #1e6b3a;
+    text-align: center;
+}
+.cart-message a { color: #1d3028; font-weight: 700; text-decoration: underline; }
+
+.product-details-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(29, 48, 40, 0.55);
+}
+.product-details-modal {
+    position: relative;
+    width: 100%;
+    max-width: 440px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 28px;
+    border-radius: 14px;
+    background: #ffffff;
+    color: #3d3532;
+    text-align: center;
+}
+.product-details-modal img { width: 100%; max-height: 260px; object-fit: contain; margin-bottom: 12px; }
+.product-details-modal > button[aria-label="Close details"] {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid #1d3028;
+    background: #fff;
+    color: #1d3028;
+    font-size: 1.3rem;
+    line-height: 1;
+}
+.product-image img { width: 100%; height: 100%; object-fit: contain; }
+
+/* ---------- cart page ---------- */
+.cart-page {
+    min-height: calc(100vh - 80px);
+    padding: 70px 15px;
+    background: #fffaf7;
+}
+.cart-layout { display: grid; grid-template-columns: 1.6fr 1fr; gap: 28px; align-items: start; }
+.cart-panel {
+    background: #ffffff;
+    border: 1px solid #ddd9d2;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 14px rgba(29, 48, 40, 0.06);
+}
+.cart-empty,
+.order-confirmation { max-width: 640px; margin: 0 auto; text-align: center; }
+.cart-row {
+    display: grid;
+    grid-template-columns: 84px 1fr auto;
+    gap: 16px;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid #eee3dc;
+}
+.cart-row:last-child { border-bottom: 0; }
+.cart-row img { width: 84px; height: 84px; object-fit: contain; border-radius: 8px; background: #f3e3dc; }
+.cart-row h3 { font-size: 1.1rem; margin: 0 0 4px; color: #292321; }
+.cart-row p { margin: 0 0 8px; color: #6b625c; font-size: 0.9rem; }
+.cart-qty { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.cart-qty-button {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    padding: 0;
+    font-size: 1.1rem;
+    line-height: 1;
+}
+.cart-remove {
+    background: none;
+    border: 0;
+    color: #7a2a22;
+    text-decoration: underline;
+    font-size: 0.9rem;
+}
+.cart-summary h2 { font-size: 1.4rem; margin-bottom: 8px; color: #1d3028; }
+.cart-total { font-size: 1.3rem; font-weight: 700; color: #292321; margin-bottom: 18px; }
+.cart-button {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    padding: 12px 20px;
+    border-radius: 25px;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+}
+.cart-empty .cart-button, .order-confirmation .cart-button { display: inline-block; width: auto; padding: 12px 30px; }
+.cart-link { display: block; margin-top: 14px; text-align: center; color: #1d3028; }
+.cart-form label {
+    display: block;
+    margin: 14px 0 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #1d3028;
+}
+.cart-form input,
+.cart-form select {
+    width: 100%;
+    padding: 11px 13px;
+    border: 1px solid #ccc7be;
+    border-radius: 6px;
+    background: #fff;
+    color: #24332d;
+    font-family: inherit;
+}
+.cart-form input:focus,
+.cart-form select:focus { outline: none; border-color: #1d3028; box-shadow: 0 0 0 3px rgba(29, 48, 40, 0.12); }
+
+@media (max-width: 860px) {
+    .cart-layout { grid-template-columns: 1fr; }
+    .cart-row { grid-template-columns: 64px 1fr; }
+    .cart-row img { width: 64px; height: 64px; }
+    .cart-row > strong { grid-column: 2; }
+}

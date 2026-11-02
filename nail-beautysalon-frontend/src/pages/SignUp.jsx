@@ -4,34 +4,49 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Alert from 'react-bootstrap/Alert';
 import { authService } from '../services/authService';
+import { getErrorMessage, getFieldErrors } from '../services/api';
+import FieldError from '../components/FieldError';
+import { hasErrors, required, validEmail, validPassword, validPhone } from '../utils';
 
 function Signup() {
     const navigate = useNavigate();
-    
-    
     const [formData, setFormData] = useState({
         firstName: '', lastName: '', email: '', cellNumber: '', password: ''
     });
-    
-   
     const [error, setError] = useState('');
+    const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+        setErrors({ ...errors, [e.target.name]: '' });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+
+        const found = {
+            firstName: required(formData.firstName, 'First name'),
+            lastName: required(formData.lastName, 'Last name'),
+            email: validEmail(formData.email),
+            cellNumber: validPhone(formData.cellNumber),
+            password: validPassword(formData.password),
+        };
+        setErrors(found);
+        if (hasErrors(found)) {
+            setError('Please fill in all the required fields marked below.');
+            return;
+        }
+
         setLoading(true);
 
         try {
-            await authService.registerCustomer(formData);
-            
+            await authService.registerCustomer({ ...formData, email: formData.email.trim() });
             navigate('/login', { state: { message: 'Account created! Please log in.' } });
         } catch (err) {
-            setError(err.response?.data?.message || 'Registration failed. Please try again.');
+            setErrors(getFieldErrors(err));
+            setError(getErrorMessage(err, 'Registration failed'));
         } finally {
             setLoading(false);
         }
@@ -46,56 +61,33 @@ function Signup() {
                     <p>Join us to book your next appointment.</p>
                 </div>
 
-                
                 {error && <Alert variant="danger">{error}</Alert>}
 
-                <Form onSubmit={handleSubmit}>
+                <Form onSubmit={handleSubmit} noValidate>
                     <div className="d-flex gap-3 mb-3">
                         <Form.Group className="w-50">
-                            <Form.Control 
-                                name="firstName" 
-                                placeholder="First Name" 
-                                onChange={handleChange} 
-                                required 
-                            />
+                            <Form.Control name="firstName" placeholder="First Name" value={formData.firstName} onChange={handleChange} />
+                            <FieldError message={errors.firstName} />
                         </Form.Group>
                         <Form.Group className="w-50">
-                            <Form.Control 
-                                name="lastName" 
-                                placeholder="Last Name" 
-                                onChange={handleChange} 
-                                required 
-                            />
+                            <Form.Control name="lastName" placeholder="Last Name" value={formData.lastName} onChange={handleChange} />
+                            <FieldError message={errors.lastName} />
                         </Form.Group>
                     </div>
 
                     <Form.Group className="mb-3">
-                        <Form.Control 
-                            type="email" 
-                            name="email" 
-                            placeholder="Email address" 
-                            onChange={handleChange} 
-                            required 
-                        />
+                        <Form.Control type="email" name="email" placeholder="Email address" value={formData.email} onChange={handleChange} />
+                        <FieldError message={errors.email} />
                     </Form.Group>
 
                     <Form.Group className="mb-3">
-                        <Form.Control 
-                            name="cellNumber" 
-                            placeholder="Cell Number" 
-                            onChange={handleChange} 
-                            required 
-                        />
+                        <Form.Control name="cellNumber" placeholder="Cell Number" value={formData.cellNumber} onChange={handleChange} />
+                        <FieldError message={errors.cellNumber} />
                     </Form.Group>
 
                     <Form.Group className="mb-4">
-                        <Form.Control 
-                            type="password" 
-                            name="password" 
-                            placeholder="Password" 
-                            onChange={handleChange} 
-                            required 
-                        />
+                        <Form.Control type="password" name="password" placeholder="Password (min 8 characters)" value={formData.password} onChange={handleChange} />
+                        <FieldError message={errors.password} />
                     </Form.Group>
 
                     <div className="auth-button-wrapper">

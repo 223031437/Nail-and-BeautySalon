@@ -4,6 +4,8 @@ package za.ac.cput.nailbeautysalon.domain;
    Author: M Hlaba (223031437)
    Date: 22 June 2026 */
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 
@@ -12,7 +14,8 @@ import java.time.LocalTime;
 @Entity
 public class Contact {
     @Id
-     private Long contactId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long contactId;
     @OneToOne
     private Address address;
     private String phone;

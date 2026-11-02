@@ -13,7 +13,8 @@ import za.ac.cput.nailbeautysalon.domain.Subject;
 import java.util.List;
 
 @Repository
-public interface InquiryRepository extends JpaRepository<Inquiry, String> {
+public interface InquiryRepository extends JpaRepository<Inquiry, Long> {
     List<Inquiry> findInquiriesBySubject(Subject subject);
     List<Inquiry> findByPhoneNumber(String phoneNumber);
+    List<Inquiry> findAllByOrderByCreatedAtDesc();
 }

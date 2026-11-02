@@ -30,7 +30,9 @@ class AppointmentServiceTest {
     Address address = new Address.Builder()
                 .setStreetNumber("12")
                 .setStreetName("Main Road")
+                .setSuburb("Sea Point")
                 .setCity("Cape Town")
+                .setProvince("Western Cape")
                 .setPostalCode(8001)
                 .build();
 

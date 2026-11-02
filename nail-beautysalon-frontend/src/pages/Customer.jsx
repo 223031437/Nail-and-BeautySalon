@@ -8,12 +8,17 @@ import Nav from 'react-bootstrap/Nav';
 import Form from 'react-bootstrap/Form';
 
 import { useAuth } from '../context/AuthContext';
+import { Link } from 'react-router-dom';
 import { getCustomer, updateCustomer, deleteCustomer } from '../api/customerApi';
+import MyBookings from '../components/MyBookings';
+import FieldError from '../components/FieldError';
+import { hasErrors, required, validPhone } from '../utils';
 
 const emptyForm = { userId: '', customerId: '', firstName: '', lastName: '', email: '', cellNumber: '' };
 
 const TABS = [
     { key: 'overview', label: 'Overview' },
+    { key: 'bookings', label: 'My Bookings' },
     { key: 'profile', label: 'My Profile' },
     { key: 'account', label: 'Account' },
 ];
@@ -39,8 +44,8 @@ function Customer() {
                 <div className="dashboard-header">
                     <div>
                         <p className="dashboard-eyebrow">CUSTOMER PORTAL</p>
-                        <h1>Welcome, {user?.name}</h1>
-                        <p>Manage your profile from your customer dashboard.</p>
+                        <h1>Welcome, {user?.name || user?.username}</h1>
+                        <p>Manage your bookings and profile from your customer dashboard.</p>
                     </div>
 
                     <Button className="logout-button" onClick={logout}>
@@ -57,6 +62,7 @@ function Customer() {
                 </Nav>
 
                 {activeTab === 'overview' && <OverviewSection onNavigate={setActiveTab} />}
+                {activeTab === 'bookings' && <MyBookings />}
                 {activeTab === 'profile' && <ProfileSection userId={user.userId} />}
                 {activeTab === 'account' && <AccountSection userId={user.userId} logout={logout} />}
 
@@ -67,6 +73,7 @@ function Customer() {
 
 function OverviewSection({ onNavigate }) {
     const cards = [
+        { key: 'bookings', title: 'My Bookings', body: 'View, reschedule or cancel your appointments.', cta: 'View Bookings' },
         { key: 'profile', title: 'My Profile', body: 'View and update your personal details.', cta: 'View Profile' },
         { key: 'account', title: 'Account', body: 'Manage your account settings.', cta: 'Account Settings' },
     ];
@@ -86,6 +93,17 @@ function OverviewSection({ onNavigate }) {
                     </Card>
                 </Col>
             ))}
+            <Col md={4}>
+                <Card className="dashboard-card">
+                    <Card.Body>
+                        <h3>Book Now</h3>
+                        <p>Choose a service and an available time slot.</p>
+                        <Button as={Link} to="/appointment" className="dashboard-button">
+                            Book Appointment
+                        </Button>
+                    </Card.Body>
+                </Card>
+            </Col>
         </Row>
     );
 }
@@ -96,6 +114,7 @@ function ProfileSection({ userId }) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [fieldErrors, setFieldErrors] = useState({});
 
     useEffect(() => {
         if (!userId) {
@@ -112,13 +131,27 @@ function ProfileSection({ userId }) {
     }, [userId]);
 
     function handleChange(field) {
-        return (event) => setForm((f) => ({ ...f, [field]: event.target.value }));
+        return (event) => {
+            setForm((f) => ({ ...f, [field]: event.target.value }));
+            setFieldErrors((e) => ({ ...e, [field]: '' }));
+        };
     }
 
     const handleSubmit = (event) => {
         event.preventDefault();
         setError('');
         setSuccess('');
+
+        const found = {
+            firstName: required(form.firstName, 'First name'),
+            lastName: required(form.lastName, 'Last name'),
+            cellNumber: validPhone(form.cellNumber),
+        };
+        setFieldErrors(found);
+        if (hasErrors(found)) {
+            setError('Please fill in all the required fields marked below.');
+            return;
+        }
 
         updateCustomer(form)
             .then((updated) => {
@@ -140,7 +173,7 @@ function ProfileSection({ userId }) {
             {loading ? (
                 <p>Loading profile…</p>
             ) : (
-                <Form onSubmit={handleSubmit}>
+                <Form onSubmit={handleSubmit} noValidate>
 
                     <Form.Group className="mb-3">
                         <Form.Label>First name</Form.Label>
@@ -149,8 +182,8 @@ function ProfileSection({ userId }) {
                             value={form.firstName || ''}
                             onChange={handleChange('firstName')}
                             disabled={!editing}
-                            required
                         />
+                        <FieldError message={fieldErrors.firstName} />
                     </Form.Group>
 
                     <Form.Group className="mb-3">
@@ -160,8 +193,8 @@ function ProfileSection({ userId }) {
                             value={form.lastName || ''}
                             onChange={handleChange('lastName')}
                             disabled={!editing}
-                            required
                         />
+                        <FieldError message={fieldErrors.lastName} />
                     </Form.Group>
 
                     <Form.Group className="mb-3">
@@ -169,10 +202,9 @@ function ProfileSection({ userId }) {
                         <Form.Control
                             type="email"
                             value={form.email || ''}
-                            onChange={handleChange('email')}
-                            disabled={!editing}
-                            required
+                            disabled
                         />
+                        <Form.Text muted>Your email is your login, so it cannot be changed here.</Form.Text>
                     </Form.Group>
 
                     <Form.Group className="mb-4">
@@ -182,8 +214,8 @@ function ProfileSection({ userId }) {
                             value={form.cellNumber || ''}
                             onChange={handleChange('cellNumber')}
                             disabled={!editing}
-                            required
                         />
+                        <FieldError message={fieldErrors.cellNumber} />
                     </Form.Group>
 
                     {editing ? (

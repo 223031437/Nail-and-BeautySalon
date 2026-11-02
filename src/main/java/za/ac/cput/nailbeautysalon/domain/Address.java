@@ -7,6 +7,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @IdClass(AddressId.class)
@@ -65,6 +66,7 @@ public class Address {
         return postalCode;
     }
 
+    @JsonIgnore
     public AddressId getAddressId() {
         return new AddressId(
                 this.streetNumber,

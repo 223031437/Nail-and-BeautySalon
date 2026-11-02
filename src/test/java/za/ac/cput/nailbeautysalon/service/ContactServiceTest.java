@@ -38,16 +38,19 @@ class ContactServiceTest {
             LocalTime.of(8, 0)
     );
 
+    private static Long createdId;
+
     @Test
     void a_create() {
         Contact created = service.create(contact);
         assertNotNull(created);
+        createdId = created.getContactId();
         System.out.println(created);
     }
 
     @Test
     void b_read() {
-        Contact read = service.read(contact.getAddress());
+        Contact read = service.read(createdId);
         assertNotNull(read);
         System.out.println(read);
     }
@@ -57,6 +60,7 @@ class ContactServiceTest {
 
         Contact updatedContact = new Contact.Builder()
                 .copy(contact)
+                .setContactId(createdId)
                 .setPhone("0839876543")
                 .build();
 
@@ -70,7 +74,7 @@ class ContactServiceTest {
     @Test
     @Disabled
     void d_delete() {
-        boolean deleted = service.delete(contact.getAddress());
+        boolean deleted = service.delete(createdId);
 
         assertTrue(deleted);
         System.out.println("Deleted: " + deleted);

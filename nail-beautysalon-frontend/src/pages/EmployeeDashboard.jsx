@@ -1,205 +1,106 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
+import Nav from 'react-bootstrap/Nav';
 
 import { useAuth } from '../context/AuthContext';
-import { getAllEmployees } from '../services/employeeService';
+import BookingsPanel from '../components/staff/BookingsPanel';
+import PaymentsPanel from '../components/staff/PaymentsPanel';
+import MessagesPanel from '../components/staff/MessagesPanel';
+import EmployeesPanel from '../components/staff/EmployeesPanel';
+import CustomersPanel from '../components/staff/CustomersPanel';
 
-function EmployeeDashboard() {
+/**
+ * Staff portal. The same page is used for the admin (/admin) and employees (/employee/dashboard);
+ * the admin additionally gets the Employees tab and can change payment statuses.
+ */
+function EmployeeDashboard({ admin = false }) {
     const { user, logout } = useAuth();
+    const isAdmin = admin || user?.role === 'ROLE_ADMIN';
+    const [activeTab, setActiveTab] = useState('overview');
 
-    // Store employees retrieved from the backend
-    const [employees, setEmployees] = useState([]);
+    const tabs = [
+        { key: 'overview', label: 'Overview' },
+        { key: 'bookings', label: 'Bookings' },
+        { key: 'payments', label: 'Payments' },
+        { key: 'messages', label: 'Messages' },
+        { key: 'customers', label: 'Customers' },
+        ...(isAdmin ? [{ key: 'employees', label: 'Employees' }] : []),
+    ];
 
-    // Track loading
-    const [loading, setLoading] = useState(true);
-
-    // Track errors
-    const [error, setError] = useState('');
-
-    // Runs when this page loads
-    useEffect(() => {
-
-        const loadEmployees = async () => {
-
-            try {
-                const response = await getAllEmployees();
-
-                console.log(
-                    'Employees received from backend:',
-                    response.data
-                );
-
-                setEmployees(response.data);
-
-            } catch (error) {
-
-                console.error(
-                    'Error retrieving employees:',
-                    error
-                );
-
-                setError(
-                    'Unable to retrieve employees from the server.'
-                );
-
-            } finally {
-
-                setLoading(false);
-
-            }
-        };
-
-        loadEmployees();
-
-    }, []);
+    const cards = [
+        { key: 'bookings', title: 'Bookings', body: 'View every booking, change a time slot or cancel.', cta: 'View Bookings' },
+        { key: 'payments', title: 'Payments', body: 'See what has been paid and what is still pending.', cta: 'View Payments' },
+        { key: 'messages', title: 'Messages', body: 'Answer messages from the Contact page by email or phone.', cta: 'View Messages' },
+        { key: 'customers', title: 'Customers', body: 'Look up registered customers.', cta: 'View Customers' },
+        ...(isAdmin ? [{ key: 'employees', title: 'Employees', body: 'Register new employees and manage the team.', cta: 'Manage Employees' }] : []),
+    ];
 
     return (
         <main className="employee-dashboard">
-
             <Container>
-
                 <div className="dashboard-header">
-
                     <div>
-                        <p className="dashboard-eyebrow">
-                            EMPLOYEE PORTAL
-                        </p>
+                        <p className="dashboard-eyebrow">{isAdmin ? 'ADMIN PORTAL' : 'EMPLOYEE PORTAL'}</p>
 
-                        <h1>
-                            Welcome, {user?.name}
-                        </h1>
+                        <h1>Welcome, {user?.name || user?.username}</h1>
 
-                        <p>
-                            Manage your salon activities from your
-                            employee dashboard.
-                        </p>
+                        <p>Manage your salon activities from your {isAdmin ? 'admin' : 'employee'} dashboard.</p>
                     </div>
 
-                    <Button
-                        className="logout-button"
-                        onClick={logout}
-                    >
+                    <Button className="logout-button" onClick={logout}>
                         Logout
                     </Button>
-
                 </div>
 
-                <Row className="g-4">
+                <Nav variant="pills" activeKey={activeTab} onSelect={(k) => setActiveTab(k)} className="portal-nav mb-4">
+                    {tabs.map((tab) => (
+                        <Nav.Item key={tab.key}>
+                            <Nav.Link eventKey={tab.key}>{tab.label}</Nav.Link>
+                        </Nav.Item>
+                    ))}
+                </Nav>
 
-                    <Col md={4}>
-                        <Card className="dashboard-card">
-                            <Card.Body>
-                                <h3>Appointments</h3>
+                {activeTab === 'overview' && (
+                    <Row className="g-4">
+                        {cards.map((card) => (
+                            <Col md={6} lg={4} key={card.key}>
+                                <Card className="dashboard-card">
+                                    <Card.Body>
+                                        <h3>{card.title}</h3>
+                                        <p>{card.body}</p>
+                                        <Button className="dashboard-button" onClick={() => setActiveTab(card.key)}>
+                                            {card.cta}
+                                        </Button>
+                                    </Card.Body>
+                                </Card>
+                            </Col>
+                        ))}
+                        <Col md={6} lg={4}>
+                            <Card className="dashboard-card">
+                                <Card.Body>
+                                    <h3>Services</h3>
+                                    <p>Add, edit or remove the services customers can book.</p>
+                                    <Button as={Link} to="/service-management" className="dashboard-button">
+                                        Manage Services
+                                    </Button>
+                                </Card.Body>
+                            </Card>
+                        </Col>
+                    </Row>
+                )}
 
-                                <p>
-                                    View and manage salon appointments.
-                                </p>
-
-                                <Button className="dashboard-button">
-                                    View Appointments
-                                </Button>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-
-                    <Col md={4}>
-                        <Card className="dashboard-card">
-                            <Card.Body>
-                                <h3>My Profile</h3>
-
-                                <p>
-                                    View your employee information.
-                                </p>
-
-                                <Button className="dashboard-button">
-                                    View Profile
-                                </Button>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-
-                    <Col md={4}>
-                        <Card className="dashboard-card">
-                            <Card.Body>
-                                <h3>Account</h3>
-
-                                <p>
-                                    Manage your account information.
-                                </p>
-
-                                <Button className="dashboard-button">
-                                    Account Settings
-                                </Button>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-
-                </Row>
-
-                
-<hr className="my-4" />
-
-<h2 className="mb-3">Salon Employees</h2>
-
-{loading && <p>Loading employees...</p>}
-
-{error && (
-    <p className="text-danger" role="alert">
-        {error}
-    </p>
-)}
-
-{!loading && !error && (
-    <Row className="g-4">
-        {employees.length === 0 ? (
-            <Col>
-                <p>No employees were found.</p>
-            </Col>
-        ) : (
-            employees.map((employee) => (
-                <Col md={6} lg={4} key={employee.userId}>
-                    <Card className="dashboard-card h-100">
-                        <Card.Body>
-                            <h5>
-                                {employee.firstName}{' '}
-                                {employee.lastName}
-                            </h5>
-
-                            {/* <p>
-                                <strong>Employee ID:</strong>{' '}
-                                {employee.employeeId}
-                            </p> */}
-
-                            <p>
-                                <strong>Email:</strong>{' '}
-                                {employee.email}
-                            </p>
-
-                            <p>
-                                <strong>Cell:</strong>{' '}
-                                {employee.cellNumber}
-                            </p>
-
-                            <p>
-                                <strong>Role:</strong>{' '}
-                                {employee.role}
-                            </p>
-                        </Card.Body>
-                    </Card>
-                </Col>
-            ))
-        )}
-    </Row>
-)}
-
-
+                {activeTab === 'bookings' && <BookingsPanel />}
+                {activeTab === 'payments' && <PaymentsPanel isAdmin={isAdmin} />}
+                {activeTab === 'messages' && <MessagesPanel isAdmin={isAdmin} />}
+                {activeTab === 'customers' && <CustomersPanel />}
+                {activeTab === 'employees' && isAdmin && <EmployeesPanel />}
             </Container>
-
         </main>
     );
 }

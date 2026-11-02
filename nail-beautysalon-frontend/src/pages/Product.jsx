@@ -3,21 +3,15 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
+import { Link } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
 
 function Product() {
+    const { quantityOf, addToCart, cartCount } = useCart();
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('all');
-    const [cart, setCart] = useState([]);
     const [message, setMessage] = useState('');
     const [selectedProduct, setSelectedProduct] = useState(null);
-    const [showCheckout, setShowCheckout] = useState(false);
-    const [customer, setCustomer] = useState({
-        name: '',
-        email: '',
-        phone: '',
-        collection: 'Collect at salon'
-    });
-    const [order, setOrder] = useState(null);
 
     const products = [
         {
@@ -52,51 +46,25 @@ function Product() {
             stock: 3,
             lowStockThreshold: 5,
             image: '/professional_hair_serum.png'
-        }
+        },
+        { id: 4, name: 'Gel Top Coat', brand: 'Nail Care Pro', category: 'Nail Care', description: 'High-shine, chip-resistant top coat that seals and protects gel colour.', price: 110, stock: 30, lowStockThreshold: 5, image: '/products/gel_top_coat.svg' },
+        { id: 5, name: 'Gentle Polish Remover', brand: 'Beauty Essentials', category: 'Nail Care', description: 'Acetone-free remover enriched with vitamin E to keep nails and skin soft.', price: 65, stock: 40, lowStockThreshold: 8, image: '/products/polish_remover.svg' },
+        { id: 6, name: 'Hand & Nail Cream', brand: 'Salon Luxe', category: 'Nail Care', description: 'Rich daily hand cream that nourishes dry hands and strengthens nails.', price: 85, stock: 22, lowStockThreshold: 5, image: '/products/hand_nail_cream.svg' },
+        { id: 7, name: 'Repair Base Coat', brand: 'Nail Care Pro', category: 'Nail Care', description: 'Strengthening base coat that protects weak, brittle nails before colour.', price: 105, stock: 4, lowStockThreshold: 5, image: '/products/nail_base_coat.svg' },
+        { id: 8, name: 'Argan Hair Oil', brand: 'Salon Luxe', category: 'Hair Care', description: 'Pure argan oil that tames frizz and adds a natural shine.', price: 195, stock: 15, lowStockThreshold: 5, image: '/products/argan_hair_oil.svg' },
+        { id: 9, name: 'Keratin Shampoo', brand: 'Beauty Essentials', category: 'Hair Care', description: 'Sulphate-free shampoo that cleanses gently and smooths damaged hair.', price: 150, stock: 20, lowStockThreshold: 5, image: '/products/keratin_shampoo.svg' },
+        { id: 10, name: 'Deep Conditioning Hair Mask', brand: 'Salon Luxe', category: 'Hair Care', description: 'Intensive weekly mask that restores moisture and softness.', price: 210, stock: 12, lowStockThreshold: 5, image: '/products/hair_mask.svg' },
+        { id: 11, name: 'Hydrating Facial Serum', brand: 'Pure Glow', category: 'Skin Care', description: 'Lightweight hyaluronic serum for plump, hydrated, glowing skin.', price: 260, stock: 10, lowStockThreshold: 5, image: '/products/facial_serum.svg' },
+        { id: 12, name: 'Gentle Facial Cleanser', brand: 'Pure Glow', category: 'Skin Care', description: 'Soap-free daily cleanser that removes make-up without drying the skin.', price: 140, stock: 26, lowStockThreshold: 5, image: '/products/facial_cleanser.svg' },
+        { id: 13, name: 'Rose Body Butter', brand: 'Pure Glow', category: 'Skin Care', description: 'Whipped shea and rose body butter for soft, deeply moisturised skin.', price: 175, stock: 0, lowStockThreshold: 5, image: '/products/rose_body_butter.svg' }
     ];
 
     const handleAddToCart = (product) => {
-        const quantity =
-            cart.find((item) => item.id === product.id)?.quantity || 0;
-
-        if (quantity >= product.stock) {
+        if (addToCart(product)) {
+            setMessage(`${product.name} added to your cart.`);
+        } else {
             setMessage('Sorry, the available stock limit has been reached.');
-            return;
         }
-
-        setCart((current) => {
-            const existing = current.find((item) => item.id === product.id);
-
-            if (existing) {
-                return current.map((item) =>
-                    item.id === product.id
-                        ? { ...item, quantity: item.quantity + 1 }
-                        : item
-                );
-            }
-
-            return [...current, { ...product, quantity: 1 }];
-        });
-
-        setMessage(`${product.name} added to your cart.`);
-        setOrder(null);
-    };
-
-    const changeQuantity = (id, amount) => {
-        setCart((current) =>
-            current
-                .map((item) => {
-                    if (item.id !== id) return item;
-                    const next = item.quantity + amount;
-                    if (next < 1 || next > item.stock) return item;
-                    return { ...item, quantity: next };
-                })
-        );
-    };
-
-    const removeItem = (id) => {
-        setCart((current) => current.filter((item) => item.id !== id));
-        setMessage('Item removed from cart.');
     };
 
     const filteredProducts = products.filter((product) => {
@@ -111,38 +79,11 @@ function Product() {
         );
     });
 
-    const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-    const cartTotal = cart.reduce(
-        (sum, item) => sum + item.price * item.quantity,
-        0
-    );
-
     const formatPrice = (price) =>
         `R${price.toLocaleString('en-ZA', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
         })}`;
-
-    const submitOrder = (event) => {
-        event.preventDefault();
-
-        if (!customer.name.trim() || !customer.email.trim() ||
-            !customer.phone.trim()) {
-            setMessage('Please complete all customer details.');
-            return;
-        }
-
-        setOrder({
-            number: `SAL-${Date.now().toString().slice(-6)}`,
-            customer: { ...customer },
-            items: cart.map((item) => ({ ...item })),
-            total: cartTotal
-        });
-
-        setCart([]);
-        setShowCheckout(false);
-        setMessage('');
-    };
 
     return (
         <section className="product-page">
@@ -173,17 +114,21 @@ function Product() {
                         <option value="all">All Categories</option>
                         <option value="Nail Care">Nail Care</option>
                         <option value="Hair Care">Hair Care</option>
+                        <option value="Skin Care">Skin Care</option>
                     </select>
                 </div>
 
-                {message && <p role="status" className="cart-message">{message}</p>}
+                {message && (
+                    <p role="status" className="cart-message">
+                        {message}{' '}
+                        {cartCount > 0 && <Link to="/cart">View cart ({cartCount})</Link>}
+                    </p>
+                )}
 
                 <Row className="product-grid">
                     {filteredProducts.length ? (
                         filteredProducts.map((product) => {
-                            const quantity =
-                                cart.find((item) => item.id === product.id)
-                                    ?.quantity || 0;
+                            const quantity = quantityOf(product.id);
 
                             const lowStock =
                                 product.stock <= product.lowStockThreshold;
@@ -252,117 +197,6 @@ function Product() {
                     )}
                 </Row>
 
-                <section className="cart-summary">
-                    <h2>Your Shopping Cart ({cartCount})</h2>
-
-                    {cart.length === 0 ? (
-                        <p>Your cart is empty. Add a product to get started.</p>
-                    ) : (
-                        <>
-                            {cart.map((item) => (
-                                <div className="cart-item" key={item.id}>
-                                    <span>{item.name} — {formatPrice(item.price)}</span>
-                                    <div className="cart-quantity">
-                                        <button type="button" onClick={() => changeQuantity(item.id, -1)}>−</button>
-                                        <span>{item.quantity}</span>
-                                        <button
-                                            type="button"
-                                            disabled={item.quantity >= item.stock}
-                                            onClick={() => changeQuantity(item.id, 1)}
-                                        >+</button>
-                                        <button type="button" onClick={() => removeItem(item.id)}>Remove</button>
-                                    </div>
-                                </div>
-                            ))}
-
-                            <h3>Total: {formatPrice(cartTotal)}</h3>
-                            <button
-                                type="button"
-                                className="checkout-button"
-                                onClick={() => setShowCheckout(true)}
-                            >
-                                Proceed to Checkout
-                            </button>
-                        </>
-                    )}
-                </section>
-
-                {showCheckout && (
-                    <section className="checkout-panel">
-                        <h2>Checkout</h2>
-                        <p>Enter your details to place your order.</p>
-
-                        <form onSubmit={submitOrder}>
-                            <label>
-                                Full Name
-                                <input
-                                    required
-                                    value={customer.name}
-                                    onChange={(e) => setCustomer({ ...customer, name: e.target.value })}
-                                />
-                            </label>
-
-                            <label>
-                                Email Address
-                                <input
-                                    required
-                                    type="email"
-                                    value={customer.email}
-                                    onChange={(e) => setCustomer({ ...customer, email: e.target.value })}
-                                />
-                            </label>
-
-                            <label>
-                                Phone Number
-                                <input
-                                    required
-                                    type="tel"
-                                    value={customer.phone}
-                                    onChange={(e) => setCustomer({ ...customer, phone: e.target.value })}
-                                />
-                            </label>
-
-                            <label>
-                                Collection Option
-                                <select
-                                    value={customer.collection}
-                                    onChange={(e) => setCustomer({ ...customer, collection: e.target.value })}
-                                >
-                                    <option>Collect at salon</option>
-                                    <option>Arrange delivery with salon</option>
-                                </select>
-                            </label>
-
-                            <h3>Order total: {formatPrice(cartTotal)}</h3>
-
-                            <button type="submit" className="checkout-button">
-                                Place Order
-                            </button>
-
-                            <button
-                                type="button"
-                                onClick={() => setShowCheckout(false)}
-                            >
-                                Cancel
-                            </button>
-                        </form>
-                    </section>
-                )}
-
-                {order && (
-                    <section className="order-confirmation" role="status">
-                        <h2>Thank you, {order.customer.name}!</h2>
-                        <p>Your demo order has been recorded on this page.</p>
-                        <p>Order reference: <strong>{order.number}</strong></p>
-                        <p>Total: {formatPrice(order.total)}</p>
-                        <p>Collection: {order.customer.collection}</p>
-                        <p>No payment has been taken. Contact the salon to confirm fulfilment.</p>
-                        <button type="button" onClick={() => setOrder(null)}>
-                            Continue Shopping
-                        </button>
-                    </section>
-                )}
-
                 {selectedProduct && (
                     <div
                         className="product-details-overlay"
@@ -393,7 +227,7 @@ function Product() {
                                 className="add-cart-button"
                                 disabled={
                                     selectedProduct.stock === 0 ||
-                                    (cart.find((item) => item.id === selectedProduct.id)?.quantity || 0) >= selectedProduct.stock
+                                    quantityOf(selectedProduct.id) >= selectedProduct.stock
                                 }
                                 onClick={() => handleAddToCart(selectedProduct)}
                             >

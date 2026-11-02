@@ -2,9 +2,16 @@ import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import { Link } from "react-router-dom";
-import { FaUser, FaCalendarAlt } from "react-icons/fa";
+import { FaUser, FaCalendarAlt, FaShoppingCart } from "react-icons/fa";
+import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
+import { homePathFor } from "./ProtectedRoute";
 
 function NavigationBar() {
+  const { user, logout } = useAuth();
+  const { cartCount } = useCart();
+  const portalLabel = user?.role === "ROLE_ADMIN" ? "Admin Dashboard" : user?.role === "ROLE_EMPLOYEE" ? "Employee Dashboard" : "My Account";
+
   return (
     <Navbar expand="lg" className="salon-navbar">
       <Container>
@@ -24,16 +31,30 @@ function NavigationBar() {
             <Nav.Link as={Link} to="/products">Products</Nav.Link>
             <Nav.Link as={Link} to="/about">About</Nav.Link>
             <Nav.Link as={Link} to="/contact">Contact</Nav.Link>
+            {user && <Nav.Link as={Link} to={homePathFor(user.role)}>{portalLabel}</Nav.Link>}
           </Nav>
 
           <div className="nav-icons">
-            <Link to="/login" className="nav-icon login-icon">
+            <Link
+              to={user ? homePathFor(user.role) : "/login"}
+              className="nav-icon login-icon"
+              title={user ? portalLabel : "Log in"}
+              aria-label={user ? portalLabel : "Log in"}
+            >
               <FaUser />
             </Link>
 
-            <Link to="/appointment" className="nav-icon book-icon">
+            <Link to="/cart" className="nav-icon cart-icon" title="Cart" aria-label={`Cart, ${cartCount} items`}>
+              <FaShoppingCart />
+              {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
+            </Link>
+
+            <Link to="/appointment" className="nav-icon book-icon" title="Book an appointment" aria-label="Book an appointment">
               <FaCalendarAlt />
             </Link>
+            {user && (
+              <button type="button" className="nav-logout" onClick={logout}>Log out</button>
+            )}
           </div>
         </Navbar.Collapse>
       </Container>

@@ -44,6 +44,15 @@ public class Helper {
         return MOBILE_PATTERN.matcher(cell).matches();
     }
 
+    /** Lenient phone check used by the website forms: 9-15 digits, optional leading +, spaces/dashes/brackets allowed. */
+    public static boolean isValidPhone(String phone) {
+        if (phone == null) {
+            return false;
+        }
+        String cleaned = phone.replaceAll("[\\s\\-()]", "");
+        return cleaned.matches("^\\+?[0-9]{9,15}$");
+    }
+
     public static boolean validateId(Long id) {
         return id != null && id > 0;
     }

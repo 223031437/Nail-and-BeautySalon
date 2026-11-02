@@ -1,5 +1,6 @@
 import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
+import { Link } from 'react-router-dom';
 
 function HeroSection() {
     return (
@@ -25,14 +26,16 @@ function HeroSection() {
 
                     <div className="hero-buttons">
                         <Button
-                            href="/appointment"
+                            as={Link}
+                            to="/appointment"
                             className="primary-button"
                         >
                             Book an Appointment
                         </Button>
 
                         <Button
-                            href="/services"
+                            as={Link}
+                            to="/services"
                             className="secondary-button"
                         >
                             Explore Services

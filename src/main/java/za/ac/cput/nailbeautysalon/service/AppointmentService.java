@@ -43,10 +43,6 @@ public class AppointmentService implements IAppointmentService <Appointment, Str
         return true;
     }
 
-    public List<Appointment> findByCustomerId(String customerId) {
-        return repository.findByCustomerId(customerId);
-    }
-
     @Override
     public List<Appointment> getAll() {
         return this.repository.findAll();

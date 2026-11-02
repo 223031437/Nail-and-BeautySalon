@@ -7,5 +7,8 @@ public enum Subject {
     Customer_Feedback,
     Billing_and_Accounts,
     Technical_Support,
-    Sales
+    Sales,
+    // Added for the public contact form (kept at the end so existing ordinals are unchanged)
+    General_Enquiry,
+    Booking_Enquiry
 }

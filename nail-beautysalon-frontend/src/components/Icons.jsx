@@ -1,7 +1,7 @@
-﻿export function IconCalendar() {
-  return <span>≡ƒôà</span>;
+export function IconCalendar() {
+  return <span>📅</span>;
 }
 
 export function IconCheck() {
-  return <span>Γ£ô</span>;
+  return <span>✓</span>;
 }

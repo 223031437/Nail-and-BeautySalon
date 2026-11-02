@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import api, { getErrorMessage } from "../services/api";
+import { useAuth } from "../context/AuthContext";
 
 
 const ServiceManagement = () => {
+    const { user } = useAuth();
     const [services, setServices] = useState([]);
 
     const [service, setService] = useState({
@@ -14,21 +18,15 @@ const ServiceManagement = () => {
 
     const [editing, setEditing] = useState(false);
 
-    const API_URL = "http://localhost:8080/service";
+    const API_URL = "/service";
 
     const getAllServices = async () => {
         try {
-            const response = await fetch(`${API_URL}/getAll`);
-
-            if (!response.ok) {
-                throw new Error("Failed to fetch services");
-            }
-
-            const data = await response.json();
-            setServices(data);
+            const response = await api.get(`${API_URL}/getAll`);
+            setServices(response.data);
         } catch (error) {
             console.error("Error fetching services:", error);
-            alert("Could not load services.");
+            alert(getErrorMessage(error, "Could not load services."));
         }
     };
 
@@ -49,20 +47,10 @@ const ServiceManagement = () => {
         e.preventDefault();
 
         try {
-            const response = await fetch(`${API_URL}/create`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    ...service,
-                    price: parseFloat(service.price)
-                })
+            await api.post(`${API_URL}/create`, {
+                ...service,
+                price: parseFloat(service.price)
             });
-
-            if (!response.ok) {
-                throw new Error("Failed to create service");
-            }
 
             alert("Service created successfully!");
 
@@ -71,7 +59,7 @@ const ServiceManagement = () => {
 
         } catch (error) {
             console.error("Error creating service:", error);
-            alert("Could not create service.");
+            alert(getErrorMessage(error, "Could not create service."));
         }
     };
 
@@ -79,20 +67,10 @@ const ServiceManagement = () => {
         e.preventDefault();
 
         try {
-            const response = await fetch(`${API_URL}/update`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    ...service,
-                    price: parseFloat(service.price)
-                })
+            await api.put(`${API_URL}/update`, {
+                ...service,
+                price: parseFloat(service.price)
             });
-
-            if (!response.ok) {
-                throw new Error("Failed to update service");
-            }
 
             alert("Service updated successfully!");
 
@@ -101,7 +79,7 @@ const ServiceManagement = () => {
 
         } catch (error) {
             console.error("Error updating service:", error);
-            alert("Could not update service.");
+            alert(getErrorMessage(error, "Could not update service."));
         }
     };
 
@@ -115,16 +93,7 @@ const ServiceManagement = () => {
         }
 
         try {
-            const response = await fetch(
-                `${API_URL}/delete/${serviceId}`,
-                {
-                    method: "DELETE"
-                }
-            );
-
-            if (!response.ok) {
-                throw new Error("Failed to delete service");
-            }
+            await api.delete(`${API_URL}/delete/${encodeURIComponent(serviceId)}`);
 
             alert("Service deleted successfully!");
 
@@ -132,7 +101,7 @@ const ServiceManagement = () => {
 
         } catch (error) {
             console.error("Error deleting service:", error);
-            alert("Could not delete service.");
+            alert(getErrorMessage(error, "Could not delete service."));
         }
     };
 
@@ -164,6 +133,8 @@ const ServiceManagement = () => {
         <div className="service-management">
 
             <h1>Service Management</h1>
+
+            <p><Link to={user?.role === "ROLE_ADMIN" ? "/admin" : "/employee/dashboard"}>← Back to dashboard</Link></p>
 
             <div className="service-form">
 

@@ -38,7 +38,6 @@ public class ContactController {
 
     @DeleteMapping("/{id}")
     public boolean delete(@PathVariable Long id){
-        service.delete(id);
-        return false;
+        return service.delete(id);
     }
 }

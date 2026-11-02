@@ -1,0 +1,142 @@
+[
+  {
+    "serviceId": "S001",
+    "serviceName": "Gel Manicure",
+    "category": "Elegant Nails",
+    "description": "A polished gel manicure designed for a clean, glossy and long-lasting finish.",
+    "price": 250
+  },
+  {
+    "serviceId": "S002",
+    "serviceName": "Luxury Pedicure",
+    "category": "Elegant Nails",
+    "description": "A relaxing pedicure experience combining nail care with a soothing foot treatment.",
+    "price": 350
+  },
+  {
+    "serviceId": "S003",
+    "serviceName": "Acrylic Full Set",
+    "category": "Elegant Nails",
+    "description": "A durable acrylic nail set customised to your preferred shape and style.",
+    "price": 450
+  },
+  {
+    "serviceId": "S004",
+    "serviceName": "Signature Nail Art",
+    "category": "Elegant Nails",
+    "description": "Creative nail art designed to add a personalised and stylish finish to your manicure.",
+    "price": 300
+  },
+  {
+    "serviceId": "S005",
+    "serviceName": "Full Body Massage",
+    "category": "Therapeutic Massage",
+    "description": "A relaxing full-body massage designed to ease everyday tension and encourage relaxation.",
+    "price": 500
+  },
+  {
+    "serviceId": "S006",
+    "serviceName": "Couples Massage",
+    "category": "Therapeutic Massage",
+    "description": "A shared relaxation experience designed for two people to unwind together.",
+    "price": 900
+  },
+  {
+    "serviceId": "S007",
+    "serviceName": "Hot Stone Massage",
+    "category": "Therapeutic Massage",
+    "description": "A calming massage experience using comfortably warmed stones alongside traditional massage techniques.",
+    "price": 650
+  },
+  {
+    "serviceId": "S008",
+    "serviceName": "Back & Shoulder Massage",
+    "category": "Therapeutic Massage",
+    "description": "A focused treatment designed to target everyday tension around the back, neck and shoulders.",
+    "price": 300
+  },
+  {
+    "serviceId": "S009",
+    "serviceName": "Deep Cleansing Facial",
+    "category": "Premium Facials",
+    "description": "A refreshing facial designed to cleanse the skin and leave it looking fresh and renewed.",
+    "price": 400
+  },
+  {
+    "serviceId": "S010",
+    "serviceName": "Hydrating Glow Facial",
+    "category": "Premium Facials",
+    "description": "A nourishing facial focused on restoring moisture and giving the skin a soft, healthy glow.",
+    "price": 450
+  },
+  {
+    "serviceId": "S011",
+    "serviceName": "Anti-Aging Facial",
+    "category": "Premium Facials",
+    "description": "A luxurious facial focused on supporting smoother-looking, hydrated and refreshed skin.",
+    "price": 550
+  },
+  {
+    "serviceId": "S012",
+    "serviceName": "Microneedling Renewal Facial",
+    "category": "Premium Facials",
+    "description": "A professional skin-renewal treatment designed to support a smoother and more refreshed appearance.",
+    "price": 750
+  },
+  {
+    "serviceId": "S013",
+    "serviceName": "Classic Lashes",
+    "category": "Lash & Brow",
+    "description": "Natural-looking individual lash extensions designed to enhance the eyes with an elegant finish.",
+    "price": 350
+  },
+  {
+    "serviceId": "S014",
+    "serviceName": "Lash Lift & Tint",
+    "category": "Lash & Brow",
+    "description": "A low-maintenance treatment that lifts and darkens the natural lashes for a brighter eye look.",
+    "price": 400
+  },
+  {
+    "serviceId": "S015",
+    "serviceName": "Brow Lamination",
+    "category": "Lash & Brow",
+    "description": "A brow styling treatment that creates a fuller, groomed and polished brow appearance.",
+    "price": 300
+  },
+  {
+    "serviceId": "S016",
+    "serviceName": "Brow Shaping & Tint",
+    "category": "Lash & Brow",
+    "description": "A personalised brow treatment combining professional shaping with tinting for a defined finish.",
+    "price": 200
+  },
+  {
+    "serviceId": "S017",
+    "serviceName": "Full Body Wax",
+    "category": "Body Waxing",
+    "description": "A complete waxing treatment for smooth, groomed skin across selected body areas.",
+    "price": 700
+  },
+  {
+    "serviceId": "S018",
+    "serviceName": "Half Leg Wax",
+    "category": "Body Waxing",
+    "description": "Professional waxing from the knee down for smooth and neatly groomed legs.",
+    "price": 250
+  },
+  {
+    "serviceId": "S019",
+    "serviceName": "Underarm Wax",
+    "category": "Body Waxing",
+    "description": "A quick and professional underarm waxing treatment for smooth, clean-looking skin.",
+    "price": 150
+  },
+  {
+    "serviceId": "S020",
+    "serviceName": "Bikini Wax",
+    "category": "Body Waxing",
+    "description": "A professional bikini-line waxing treatment for a clean and neatly groomed finish.",
+    "price": 250
+  }
+]

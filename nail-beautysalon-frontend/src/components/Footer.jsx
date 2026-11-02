@@ -1,6 +1,7 @@
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import { Link } from 'react-router-dom';
 
 function Footer() {
     return (
@@ -23,23 +24,27 @@ function Footer() {
 
                         <ul>
                             <li>
-                                <a href="/">Home</a>
+                                <Link to="/">Home</Link>
                             </li>
 
                             <li>
-                                <a href="/services">Services</a>
+                                <Link to="/services">Services</Link>
                             </li>
 
                             <li>
-                                <a href="/products">Products</a>
+                                <Link to="/products">Products</Link>
                             </li>
 
                             <li>
-                                <a href="/contact">Contact</a>
+                                <Link to="/contact">Contact</Link>
                             </li>
 
                             <li>
-                                <a href="/about">About</a>
+                                <Link to="/about">About</Link>
+                            </li>
+
+                            <li>
+                                <Link to="/login">Staff &amp; Admin Login</Link>
                             </li>
                         </ul>
                     </Col>

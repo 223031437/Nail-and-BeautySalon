@@ -1,11 +1,14 @@
-
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { appointmentsApi } from '../api/appointments';
+import { getServices } from '../services/bookingService';
+import { getErrorMessage, getFieldErrors } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import { Notice } from '../components/UIState';
 import { IconCalendar, IconCheck } from '../components/Icons';
-
-const API_URL = 'http://localhost:8080';
+import FieldError from '../components/FieldError';
+import SlotPicker from '../components/SlotPicker';
+import { hasErrors, required } from '../utils';
 
 const PROVINCES = [
   'Eastern Cape',
@@ -19,6 +22,8 @@ const PROVINCES = [
   'Western Cape',
 ];
 
+const PAYMENT_METHODS = ['Pay at salon', 'EFT / bank transfer', 'Card at salon'];
+
 const emptyForm = () => ({
   dateTime: '',
   serviceSelected: '',
@@ -28,137 +33,87 @@ const emptyForm = () => ({
   city: '',
   province: '',
   postalCode: '',
+  paymentMethod: '',
   notes: '',
 });
 
-const generateAppointmentId = () =>
-  `APT-${Date.now().toString(36).toUpperCase()}`;
+const validate = (form) => ({
+  serviceSelected: required(form.serviceSelected, 'Service'),
+  dateTime: form.dateTime ? '' : 'Please choose a date and an available time slot',
+  streetNumber: required(form.streetNumber, 'Street number'),
+  streetName: required(form.streetName, 'Street name'),
+  suburb: required(form.suburb, 'Suburb'),
+  city: required(form.city, 'City'),
+  province: required(form.province, 'Province'),
+  postalCode: !form.postalCode.trim()
+    ? 'Postal code is required'
+    : /^\d{4}$/.test(form.postalCode.trim())
+      ? ''
+      : 'Postal code must be 4 digits',
+  paymentMethod: required(form.paymentMethod, 'Payment method'),
+});
 
 const BookAppointment = () => {
   const location = useLocation();
+  const { user } = useAuth();
   const selectedService = location.state?.service;
 
   const [form, setForm] = useState(() => ({
     ...emptyForm(),
     serviceSelected: selectedService?.serviceName || '',
   }));
-
+  const [errors, setErrors] = useState({});
   const [services, setServices] = useState([]);
   const [loadingServices, setLoadingServices] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState(null);
+  const [slotRefresh, setSlotRefresh] = useState(0);
 
   // Load services maintained by the backend.
   useEffect(() => {
     let active = true;
 
-    const fetchServices = async () => {
-      try {
-        const response = await fetch(`${API_URL}/service/getAll`);
-
-        if (!response.ok) {
-          throw new Error('Unable to load services. Please try again.');
-        }
-
-        const data = await response.json();
-
-        if (active) {
-          setServices(Array.isArray(data) ? data : []);
-        }
-      } catch (error) {
-        if (active) {
-          setResult({
-            ok: false,
-            message: error.message || 'Unable to load services.',
-          });
-        }
-      } finally {
-        if (active) {
-          setLoadingServices(false);
-        }
-      }
-    };
-
-    fetchServices();
+    getServices()
+      .then((data) => {
+        if (active) setServices(Array.isArray(data) ? data : []);
+      })
+      .catch((error) => {
+        if (active) setResult({ ok: false, message: getErrorMessage(error, 'Unable to load services.') });
+      })
+      .finally(() => {
+        if (active) setLoadingServices(false);
+      });
 
     return () => {
       active = false;
     };
   }, []);
 
-  // Preselect the service sent from ServiceDetails.
-  useEffect(() => {
-    if (selectedService?.serviceName) {
-      setForm((current) => ({
-        ...current,
-        serviceSelected: selectedService.serviceName,
-      }));
-    }
-  }, [selectedService?.serviceName]);
-
   const handleChange = (event) => {
     const { name, value } = event.target;
+    setForm((current) => ({ ...current, [name]: value }));
+    setErrors((current) => ({ ...current, [name]: '' }));
+  };
 
-    setForm((current) => ({
-      ...current,
-      [name]: value,
-    }));
+  const handleSlot = (dateTime) => {
+    setForm((current) => ({ ...current, dateTime }));
+    setErrors((current) => ({ ...current, dateTime: '' }));
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
     if (submitting) return;
-
     setResult(null);
 
-    if (!form.dateTime) {
-      setResult({
-        ok: false,
-        message: 'Please select a date and time.',
-      });
-      return;
-    }
-
-    if (!form.serviceSelected) {
-      setResult({
-        ok: false,
-        message: 'Please select a service.',
-      });
-      return;
-    }
-
-    if (!form.province) {
-      setResult({
-        ok: false,
-        message: 'Please select a province.',
-      });
-      return;
-    }
-
-    if (!/^\d{4}$/.test(form.postalCode.trim())) {
-      setResult({
-        ok: false,
-        message: 'Please enter a valid 4-digit postal code.',
-      });
-      return;
-    }
-
-    const selectedDate = new Date(form.dateTime);
-
-    if (
-      Number.isNaN(selectedDate.getTime()) ||
-      selectedDate <= new Date()
-    ) {
-      setResult({
-        ok: false,
-        message: 'Please select a future date and time.',
-      });
+    const found = validate(form);
+    setErrors(found);
+    if (hasErrors(found)) {
+      setResult({ ok: false, message: 'Please fill in all the required fields marked below.' });
       return;
     }
 
     const payload = {
-      appointmentId: generateAppointmentId(),
       dateTime: form.dateTime,
       serviceSelected: form.serviceSelected,
       address: {
@@ -169,36 +124,40 @@ const BookAppointment = () => {
         province: form.province,
         postalCode: form.postalCode.trim(),
       },
+      paymentMethod: form.paymentMethod,
       notes: form.notes.trim(),
-      status: 'Pending',
     };
 
     try {
       setSubmitting(true);
 
-      await appointmentsApi.create(payload);
+      const booking = await appointmentsApi.create(payload);
 
       setResult({
         ok: true,
         message:
-          `Booked! Your reference is ${payload.appointmentId}. ` +
-          'The studio will confirm your appointment shortly.',
+          `Booked! Your reference is ${booking.appointmentId}. ` +
+          `A confirmation email has been sent to ${booking.customerEmail || 'you'}. ` +
+          'You can change the time or cancel under "My Bookings" in your account.',
+        showLink: true,
       });
 
       setForm(emptyForm());
+      setErrors({});
     } catch (error) {
-      console.error('Appointment booking error:', error);
-
-      setResult({
-        ok: false,
-        message:
-          error?.message ||
-          'Unable to book your appointment. Please try again.',
-      });
+      setErrors(getFieldErrors(error));
+      setResult({ ok: false, message: getErrorMessage(error, 'Unable to book your appointment. Please try again.') });
+      // The slot may just have been taken by someone else - reload the slots and clear the choice.
+      if (error?.response?.status === 409) {
+        setForm((current) => ({ ...current, dateTime: '' }));
+        setSlotRefresh((n) => n + 1);
+      }
     } finally {
       setSubmitting(false);
     }
   };
+
+  const canBook = user?.role === 'ROLE_CUSTOMER';
 
   return (
     <section className="section form-page">
@@ -209,7 +168,7 @@ const BookAppointment = () => {
           <h1>Book an appointment</h1>
 
           <p className="lede">
-            Choose your service, select a suitable date and time,
+            Choose your service, pick an available time slot,
             and provide your contact address.
           </p>
 
@@ -217,148 +176,105 @@ const BookAppointment = () => {
             <IconCalendar width={18} height={18} />
 
             <span>
-              Bookings are reviewed by the studio and confirmed
-              by phone or email before your appointment is locked in.
+              Time slots that are already booked are greyed out. You will get a
+              confirmation email straight away, and you can change the time or
+              cancel from your account.
             </span>
           </div>
         </div>
 
-        <form
-          className="card form-card"
-          onSubmit={handleSubmit}
-          noValidate
-        >
-          {result && (
-            <Notice type={result.ok ? 'success' : 'error'}>
-              <span
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                }}
-              >
-                {result.ok && (
-                  <IconCheck width={16} height={16} />
-                )}
-
-                {result.message}
-              </span>
+        <form className="card form-card" onSubmit={handleSubmit} noValidate>
+          {!user && (
+            <Notice type="error">
+              Please <Link to="/login">log in</Link> or <Link to="/signup">create an account</Link> to book an appointment.
             </Notice>
           )}
 
-          <div className="form-row">
-            <div className="field">
-              <label htmlFor="serviceSelected">Service</label>
+          {user && !canBook && (
+            <Notice type="error">
+              Appointments are booked by customers. You are signed in as staff, so use your dashboard to manage bookings.
+            </Notice>
+          )}
 
-              <select
-                id="serviceSelected"
-                name="serviceSelected"
-                value={form.serviceSelected}
-                onChange={handleChange}
-                required
-                disabled={loadingServices}
-              >
-                <option value="">
-                  {loadingServices
-                    ? 'Loading services...'
-                    : 'Choose a service'}
-                </option>
-
-                {form.serviceSelected &&
-                  !services.some(
-                    (service) =>
-                      service.serviceName === form.serviceSelected
-                  ) && (
-                    <option value={form.serviceSelected}>
-                      {form.serviceSelected}
-                    </option>
-                  )}
-
-                {services.map((service) => (
-                  <option
-                    key={service.serviceId}
-                    value={service.serviceName}
-                  >
-                    {service.serviceName}
-                    {service.price != null
-                      ? ` — R${Number(service.price).toFixed(2)}`
-                      : ''}
-                  </option>
-                ))}
-              </select>
-
-              {!loadingServices && services.length === 0 && (
-                <small>
-                  Services could not be loaded. Check that the
-                  backend is running and has services available.
-                </small>
+          {result && (
+            <Notice type={result.ok ? 'success' : 'error'}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                {result.ok && <IconCheck width={16} height={16} />}
+                {result.message}
+              </span>
+              {result.showLink && (
+                <span style={{ display: 'block', marginTop: 8 }}>
+                  <Link to="/customer/dashboard">Go to My Bookings</Link>
+                </span>
               )}
-            </div>
+            </Notice>
+          )}
 
-            <div className="field">
-              <label htmlFor="dateTime">Date &amp; time</label>
+          <div className="field">
+            <label htmlFor="serviceSelected">Service</label>
 
-              <input
-                id="dateTime"
-                type="datetime-local"
-                name="dateTime"
-                value={form.dateTime}
-                onChange={handleChange}
-                min={getLocalDateTime()}
-                required
-              />
-            </div>
+            <select
+              id="serviceSelected"
+              name="serviceSelected"
+              value={form.serviceSelected}
+              onChange={handleChange}
+              disabled={loadingServices}
+              aria-invalid={!!errors.serviceSelected}
+            >
+              <option value="">{loadingServices ? 'Loading services...' : 'Choose a service'}</option>
+
+              {form.serviceSelected &&
+                !services.some((service) => service.serviceName === form.serviceSelected) && (
+                  <option value={form.serviceSelected}>{form.serviceSelected}</option>
+                )}
+
+              {services.map((service) => (
+                <option key={service.serviceId} value={service.serviceName}>
+                  {service.serviceName}
+                  {service.price != null ? ` — R${Number(service.price).toFixed(2)}` : ''}
+                </option>
+              ))}
+            </select>
+            <FieldError message={errors.serviceSelected} />
+
+            {!loadingServices && services.length === 0 && (
+              <small>Services could not be loaded. Check that the backend is running and has services available.</small>
+            )}
           </div>
 
-          <p className="form-card__subhead">
-            Your contact address
-          </p>
+          <div className="field" style={{ marginTop: 22 }}>
+            <label>Date &amp; time slot</label>
+            <SlotPicker value={form.dateTime} onChange={handleSlot} refreshKey={slotRefresh} />
+            <FieldError message={errors.dateTime} />
+          </div>
+
+          <p className="form-card__subhead">Your contact address</p>
 
           <div className="form-row">
             <div className="field">
               <label htmlFor="streetNumber">Street number</label>
-              <input
-                id="streetNumber"
-                name="streetNumber"
-                value={form.streetNumber}
-                onChange={handleChange}
-                required
-              />
+              <input id="streetNumber" name="streetNumber" value={form.streetNumber} onChange={handleChange} />
+              <FieldError message={errors.streetNumber} />
             </div>
 
             <div className="field">
               <label htmlFor="streetName">Street name</label>
-              <input
-                id="streetName"
-                name="streetName"
-                value={form.streetName}
-                onChange={handleChange}
-                required
-              />
+              <input id="streetName" name="streetName" value={form.streetName} onChange={handleChange} />
+              <FieldError message={errors.streetName} />
             </div>
           </div>
 
           <div className="form-row">
             <div className="field">
               <label htmlFor="suburb">Suburb</label>
-              <input
-                id="suburb"
-                name="suburb"
-                value={form.suburb}
-                onChange={handleChange}
-                required
-              />
+              <input id="suburb" name="suburb" value={form.suburb} onChange={handleChange} />
+              <FieldError message={errors.suburb} />
             </div>
 
             <div className="field">
               <label htmlFor="city">City</label>
-              <input
-                id="city"
-                name="city"
-                value={form.city}
-                onChange={handleChange}
-                required
-              />
+              <input id="city" name="city" value={form.city} onChange={handleChange} />
+              <FieldError message={errors.city} />
             </div>
           </div>
 
@@ -366,21 +282,15 @@ const BookAppointment = () => {
             <div className="field">
               <label htmlFor="province">Province</label>
 
-              <select
-                id="province"
-                name="province"
-                value={form.province}
-                onChange={handleChange}
-                required
-              >
+              <select id="province" name="province" value={form.province} onChange={handleChange}>
                 <option value="">Select a province</option>
-
                 {PROVINCES.map((province) => (
                   <option key={province} value={province}>
                     {province}
                   </option>
                 ))}
               </select>
+              <FieldError message={errors.province} />
             </div>
 
             <div className="field">
@@ -392,18 +302,31 @@ const BookAppointment = () => {
                 type="text"
                 inputMode="numeric"
                 maxLength={4}
-                pattern="[0-9]{4}"
                 value={form.postalCode}
                 onChange={handleChange}
-                required
               />
+              <FieldError message={errors.postalCode} />
             </div>
           </div>
 
+          <p className="form-card__subhead">Payment</p>
+
           <div className="field">
-            <label htmlFor="notes">
-              Notes for your artist (optional)
-            </label>
+            <label htmlFor="paymentMethod">How will you pay?</label>
+            <select id="paymentMethod" name="paymentMethod" value={form.paymentMethod} onChange={handleChange}>
+              <option value="">Select a payment method</option>
+              {PAYMENT_METHODS.map((method) => (
+                <option key={method} value={method}>
+                  {method}
+                </option>
+              ))}
+            </select>
+            <FieldError message={errors.paymentMethod} />
+            <small className="slot-hint">Payment is settled with the salon; your booking shows as “Pending” until it is received.</small>
+          </div>
+
+          <div className="field" style={{ marginTop: 22 }}>
+            <label htmlFor="notes">Notes for your artist (optional)</label>
 
             <textarea
               id="notes"
@@ -415,11 +338,7 @@ const BookAppointment = () => {
             />
           </div>
 
-          <button
-            className="btn btn-primary"
-            type="submit"
-            disabled={submitting || loadingServices}
-          >
+          <button className="btn btn-primary" type="submit" disabled={submitting || loadingServices || !canBook}>
             {submitting ? 'Booking...' : 'Request appointment'}
           </button>
         </form>
@@ -427,11 +346,5 @@ const BookAppointment = () => {
     </section>
   );
 };
-
-function getLocalDateTime() {
-  const now = new Date();
-  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-  return now.toISOString().slice(0, 16);
-}
 
 export default BookAppointment;
