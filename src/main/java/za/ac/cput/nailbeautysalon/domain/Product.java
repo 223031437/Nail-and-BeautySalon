@@ -7,7 +7,7 @@ import jakarta.persistence.Id;
    Student number: 222927402
  */
 @Entity
-public class Product {
+public class Product{
     @Id
     private int productID;
     private String productName;
@@ -19,7 +19,9 @@ public class Product {
     private String supplier;
     private String description;
 
-    protected Product() {}
+    public Product (){
+
+    }
 
     private Product(Builder builder) {
         this.productID = builder.productID;

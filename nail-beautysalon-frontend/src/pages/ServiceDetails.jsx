@@ -10,9 +10,11 @@ import facialServicesImage from '../assets/facial-services.jpeg';
 import massageServicesImage from '../assets/massage-services.jpeg';
 import nailServicesImage from '../assets/nail-services.jpeg';
 import waxingServicesImage from '../assets/waxing-services.png';
+import { useNavigate } from 'react-router-dom';
 
 function ServiceDetails({ service, onBack }) {
 
+        const navigate = useNavigate();
     if (!service) {
         return (
             <div className="service-details-not-found">
@@ -102,7 +104,14 @@ function ServiceDetails({ service, onBack }) {
 
                     <div className="service-details-actions">
 
-                        <button className="book-service-button">
+                        <button
+                            className="book-service-button"
+                            onClick={() =>
+                                navigate('/appointment', {
+                                    state: { service },
+                                })
+                            }
+                        >
                             Book Appointment
                         </button>
 

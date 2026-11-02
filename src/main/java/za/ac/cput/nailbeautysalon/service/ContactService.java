@@ -2,43 +2,54 @@ package za.ac.cput.nailbeautysalon.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import za.ac.cput.nailbeautysalon.domain.Address;
-import za.ac.cput.nailbeautysalon.domain.AddressId;
+import org.springframework.transaction.annotation.Transactional;
 import za.ac.cput.nailbeautysalon.domain.Contact;
+import za.ac.cput.nailbeautysalon.repository.AddressRepository;
 import za.ac.cput.nailbeautysalon.repository.ContactRepository;
 
 import java.util.Collection;
 import java.util.List;
 
 @Service
-public class ContactService implements IContactService{
+public class ContactService implements IContactService {
 
-    private ContactRepository repository;
+    private final ContactRepository repository;
+    private final AddressRepository addressRepository;
 
     @Autowired
-    public ContactService(ContactRepository repository) {
+    public ContactService(ContactRepository repository, AddressRepository addressRepository) {
         this.repository = repository;
+        this.addressRepository = addressRepository;
     }
 
     @Override
+    @Transactional
     public Contact create(Contact contact) {
+        if (contact == null || contact.getAddress() == null) return null;
+        addressRepository.save(contact.getAddress());
         return this.repository.save(contact);
     }
 
     @Override
-    public Contact read(Address address) {
-        return repository.findById(address.getAddressId()).orElse(null);
+    public Contact read(Long id) {
+        return repository.findById(id).orElse(null);
     }
 
     @Override
+    @Transactional
     public Contact update(Contact contact) {
+        if (contact == null || contact.getContactId() == null
+                || !repository.existsById(contact.getContactId())) {
+            return null;
+        }
+        if (contact.getAddress() != null) {
+            addressRepository.save(contact.getAddress());
+        }
         return this.repository.save(contact);
     }
 
     @Override
-    public boolean delete(Address address) {
-        AddressId id = address.getAddressId();
-
+    public boolean delete(Long id) {
         if (repository.existsById(id)) {
             repository.deleteById(id);
             return true;
@@ -55,6 +66,4 @@ public class ContactService implements IContactService{
     public List<Contact> findContactByAddressProvinceIn(Collection<String> addressProvinces) {
         return repository.findContactByAddressProvinceIn(addressProvinces);
     }
-
-
 }

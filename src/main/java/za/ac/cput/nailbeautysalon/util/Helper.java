@@ -44,4 +44,8 @@ public class Helper {
         return MOBILE_PATTERN.matcher(cell).matches();
     }
 
+    public static boolean validateId(Long id) {
+        return id != null && id > 0;
+    }
+
 }

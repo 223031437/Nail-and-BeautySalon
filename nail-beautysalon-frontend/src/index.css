@@ -1726,7 +1726,7 @@ code {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%), url('/Product_Background.png') center / cover fixed; /* Soft, premium background */
+    background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%), url('/hero.png') center / cover fixed; /* Soft, premium background */
     padding: 20px;
 }
 

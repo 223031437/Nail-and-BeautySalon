@@ -16,6 +16,9 @@ import za.ac.cput.nailbeautysalon.dto.*;
 import za.ac.cput.nailbeautysalon.repository.AccountRepository;
 import za.ac.cput.nailbeautysalon.repository.CustomerRepository;
 import za.ac.cput.nailbeautysalon.repository.EmployeeRepository;
+import za.ac.cput.nailbeautysalon.repository.AppointmentRepository;
+import za.ac.cput.nailbeautysalon.domain.Appointment;
+import java.util.List;
 import za.ac.cput.nailbeautysalon.security.JwtUtil;
 
 import java.util.Map;
@@ -25,6 +28,8 @@ import java.util.UUID;
 @RequestMapping("/auth")
 public class AuthController {
 
+
+
     private static final Logger log = LoggerFactory.getLogger(AuthController.class);
 
     private final AuthenticationManager authenticationManager;
@@ -33,19 +38,22 @@ public class AuthController {
     private final AccountRepository     accountRepository;
     private final CustomerRepository    customerRepository;
     private final EmployeeRepository    employeeRepository;
+    private final AppointmentRepository appointmentRepository;
 
     public AuthController(AuthenticationManager authenticationManager,
                           JwtUtil jwtUtil,
                           PasswordEncoder passwordEncoder,
                           AccountRepository accountRepository,
                           CustomerRepository customerRepository,
-                          EmployeeRepository employeeRepository) {
+                          EmployeeRepository employeeRepository,
+                          AppointmentRepository appointmentRepository) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil               = jwtUtil;
         this.passwordEncoder       = passwordEncoder;
         this.accountRepository     = accountRepository;
         this.customerRepository    = customerRepository;
         this.employeeRepository    = employeeRepository;
+        this.appointmentRepository = appointmentRepository;
     }
 
     @PostMapping("/login")
@@ -127,7 +135,7 @@ public class AuthController {
 
         // 1. Create Employee
         Employee employee = new Employee.Builder()
-                .setUserId(newId)        // <-- FIX: Hibernate requires this
+                .setUserId(newId)
                 .setEmployeeId(newId)
                 .setFirstName(req.firstName())
                 .setLastName(req.lastName())
@@ -152,5 +160,24 @@ public class AuthController {
                         "message", "Employee registered successfully",
                         "userId",  newId
                 ));
+    }
+
+    @GetMapping("/customer/appointments")
+    public ResponseEntity<?> getMyAppointments(Authentication authentication) {
+        if (authentication == null || !(authentication.getPrincipal() instanceof Account)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Not logged in"));
+        }
+
+        Account account = (Account) authentication.getPrincipal();
+        String customerId = account.getUserId();
+
+        // If the user is an admin (userId is null), return empty or error
+        if (customerId == null) {
+            return ResponseEntity.ok(List.of());
+        }
+
+        //List<Appointment> appointments = appointmentRepository.findByCustomerId(customerId);
+        List<Appointment> appointments = appointmentRepository.findAll();
+        return ResponseEntity.ok(appointments);
     }
 }

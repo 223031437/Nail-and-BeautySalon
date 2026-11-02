@@ -14,4 +14,5 @@ public interface IEmployeeService <T, ID>{
     T update(T t);
     boolean delete(ID id);
     List<Employee> getAll();
+    List<Employee> findByEmail(String email);
 }

@@ -8,9 +8,9 @@ import java.util.List;
 
 public interface IContactService {
     Contact create(Contact contact);
-    Contact read(Address id);
+    Contact read(Long id);
     Contact update(Contact contact);
-    boolean delete(Address id);
+    boolean delete(Long id);
 
     List<Contact> getAll();
     List<Contact> findContactByAddressProvinceIn(Collection<String> addressProvinces);

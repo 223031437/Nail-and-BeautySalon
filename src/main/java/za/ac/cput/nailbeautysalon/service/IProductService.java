@@ -17,4 +17,5 @@ public interface IProductService<T, ID> {
     boolean delete(ID id);
 
     List<Product> getAll();
+    List<Product> findByCategory(String category);
 }

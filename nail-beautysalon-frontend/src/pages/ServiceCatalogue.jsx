@@ -5,8 +5,9 @@
  * The Service Catalogue Page displays all beauty and wellness services offered by the nail and beauty salon.
  */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ServiceDetails from './ServiceDetails';
+import api from '../services/API';
 
 import eyebrowServicesImage from '../assets/eyebrow-services.jpeg';
 import facialServicesImage from '../assets/facial-services.jpeg';
@@ -16,8 +17,28 @@ import waxingServicesImage from '../assets/waxing-services.png';
 
 function ServiceCatalogue() {
     const [selectedService, setSelectedService] = useState(null);
+    const [databaseServices, setDatabaseServices] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
 
-    const services = [
+    useEffect(() => {
+        api.get('/service/getAll')
+            .then((response) => {
+                setDatabaseServices(response.data);
+                setError('');
+            })
+            .catch((err) => {
+                console.error('Could not load services:', err);
+                setError('We could not load services at this time.');
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+    }, []);
+
+    // Extra details are kept locally because the database currently stores
+    // serviceId, serviceName, category, description and price only.
+    const localServices = [
         {
             serviceId: 'S001',
             serviceName: 'Gel Manicure',
@@ -33,7 +54,6 @@ function ServiceCatalogue() {
             ],
             aftercare: 'Avoid picking or peeling the gel. Use cuticle oil regularly and return for professional removal when needed.'
         },
-
         {
             serviceId: 'S002',
             serviceName: 'Luxury Pedicure',
@@ -51,7 +71,6 @@ function ServiceCatalogue() {
             ],
             aftercare: 'Keep feet moisturised and avoid very hot water immediately after the treatment.'
         },
-
         {
             serviceId: 'S003',
             serviceName: 'Acrylic Full Set',
@@ -67,7 +86,6 @@ function ServiceCatalogue() {
             ],
             aftercare: 'Avoid using your nails as tools. Keep them clean and return for maintenance or professional removal.'
         },
-
         {
             serviceId: 'S004',
             serviceName: 'Signature Nail Art',
@@ -83,7 +101,6 @@ function ServiceCatalogue() {
             ],
             aftercare: 'Allow the nails to fully set and avoid harsh chemicals where possible to help preserve the design.'
         },
-
         {
             serviceId: 'S005',
             serviceName: 'Full Body Massage',
@@ -99,7 +116,6 @@ function ServiceCatalogue() {
             ],
             aftercare: 'Drink water, rest when possible and avoid intense physical activity immediately after your treatment.'
         },
-
         {
             serviceId: 'S006',
             serviceName: 'Couples Massage',
@@ -115,7 +131,6 @@ function ServiceCatalogue() {
             ],
             aftercare: 'Stay hydrated, take time to relax after the treatment and avoid strenuous activity immediately afterwards.'
         },
-
         {
             serviceId: 'S007',
             serviceName: 'Hot Stone Massage',
@@ -131,7 +146,6 @@ function ServiceCatalogue() {
             ],
             aftercare: 'Drink water and allow your body time to relax. Inform your therapist immediately if you experience discomfort during treatment.'
         },
-
         {
             serviceId: 'S008',
             serviceName: 'Back & Shoulder Massage',
@@ -147,7 +161,6 @@ function ServiceCatalogue() {
             ],
             aftercare: 'Stay hydrated and avoid strenuous activity immediately after the session.'
         },
-
         {
             serviceId: 'S009',
             serviceName: 'Deep Cleansing Facial',
@@ -164,7 +177,6 @@ function ServiceCatalogue() {
             ],
             aftercare: 'Keep the skin moisturised and use daily sunscreen. Avoid harsh exfoliation immediately after the treatment.'
         },
-
         {
             serviceId: 'S010',
             serviceName: 'Hydrating Glow Facial',
@@ -181,7 +193,6 @@ function ServiceCatalogue() {
             ],
             aftercare: 'Keep the skin hydrated and use sunscreen during the day. Avoid introducing harsh new skincare products immediately after treatment.'
         },
-
         {
             serviceId: 'S011',
             serviceName: 'Anti-Aging Facial',
@@ -198,7 +209,6 @@ function ServiceCatalogue() {
             ],
             aftercare: 'Use gentle skincare and daily sunscreen. Follow the specific aftercare recommendations provided by your beauty therapist.'
         },
-
         {
             serviceId: 'S012',
             serviceName: 'Microneedling Renewal Facial',
@@ -214,7 +224,6 @@ function ServiceCatalogue() {
             ],
             aftercare: 'Follow the professional aftercare instructions provided after your treatment. Protect your skin from direct sun exposure and avoid harsh active skincare products until your skin has recovered.'
         },
-
         {
             serviceId: 'S013',
             serviceName: 'Classic Lashes',
@@ -230,7 +239,6 @@ function ServiceCatalogue() {
             ],
             aftercare: 'Avoid rubbing the eyes and excessive moisture immediately after the treatment. Clean lashes gently using suitable lash-safe products.'
         },
-
         {
             serviceId: 'S014',
             serviceName: 'Lash Lift & Tint',
@@ -246,7 +254,6 @@ function ServiceCatalogue() {
             ],
             aftercare: 'Avoid excessive moisture and steam immediately after the treatment and avoid rubbing the eye area.'
         },
-
         {
             serviceId: 'S015',
             serviceName: 'Brow Lamination',
@@ -262,7 +269,6 @@ function ServiceCatalogue() {
             ],
             aftercare: 'Avoid excessive moisture on the brows immediately after treatment and gently brush the brows into place as recommended by your therapist.'
         },
-
         {
             serviceId: 'S016',
             serviceName: 'Brow Shaping & Tint',
@@ -278,7 +284,6 @@ function ServiceCatalogue() {
             ],
             aftercare: 'Avoid rubbing the brow area and use gentle skincare around the brows immediately after treatment.'
         },
-
         {
             serviceId: 'S017',
             serviceName: 'Full Body Wax',
@@ -294,7 +299,6 @@ function ServiceCatalogue() {
             ],
             aftercare: 'Avoid hot baths, saunas, intense exercise and tight clothing immediately after waxing. Keep the skin clean and moisturised and avoid harsh exfoliation for a short period.'
         },
-
         {
             serviceId: 'S018',
             serviceName: 'Half Leg Wax',
@@ -309,7 +313,6 @@ function ServiceCatalogue() {
             ],
             aftercare: 'Avoid heat, friction and intense exercise immediately after waxing. Keep the skin moisturised and avoid harsh exfoliation right away.'
         },
-
         {
             serviceId: 'S019',
             serviceName: 'Underarm Wax',
@@ -324,7 +327,6 @@ function ServiceCatalogue() {
             ],
             aftercare: 'Avoid deodorant, heavy sweating and friction immediately after treatment if the area feels sensitive.'
         },
-
         {
             serviceId: 'S020',
             serviceName: 'Bikini Wax',
@@ -341,6 +343,18 @@ function ServiceCatalogue() {
         }
     ];
 
+    // Combine database records with the extra details kept in the frontend.
+    const services = databaseServices.map((databaseService) => {
+        const localService = localServices.find(
+            (service) => service.serviceId === databaseService.serviceId
+        );
+
+        return {
+            ...localService,
+            ...databaseService
+        };
+    });
+
     const categories = [
         ...new Set(services.map((service) => service.category))
     ];
@@ -352,6 +366,23 @@ function ServiceCatalogue() {
         'Lash & Brow': eyebrowServicesImage,
         'Body Waxing': waxingServicesImage
     };
+
+    if (loading) {
+        return (
+            <div className="services-catalogue">
+                <p>Loading services...</p>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="services-catalogue">
+                <p>{error}</p>
+                <p>Please check that the backend server is running.</p>
+            </div>
+        );
+    }
 
     if (selectedService) {
         return (
@@ -447,3 +478,4 @@ function ServiceCatalogue() {
 }
 
 export default ServiceCatalogue;
+

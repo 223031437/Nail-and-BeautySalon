@@ -14,13 +14,10 @@ public class Cors {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Allow your React app's origin
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
-        // Allow the methods you use (OPTIONS is crucial for preflight)
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        // Allow all headers
         configuration.setAllowedHeaders(Arrays.asList("*"));
-        // Allow credentials if you plan to use them (e.g., cookies/JWT later)
+
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

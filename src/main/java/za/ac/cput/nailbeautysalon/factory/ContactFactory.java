@@ -12,8 +12,8 @@ import za.ac.cput.nailbeautysalon.domain.Contact;
 import java.time.LocalTime;
 
 public class ContactFactory {
-    public static Contact createContact(Address address, String phone, String email, LocalTime hours) {
-        if (address == null || !Helper.isValidMobile(phone) || !Helper.isValidEmail(email) || hours == null) {
+    public static Contact createContact(Long contactId, Address address, String phone, String email, LocalTime hours) {
+        if ( Helper.validateId(contactId)|| address == null || !Helper.isValidMobile(phone) || !Helper.isValidEmail(email) || hours == null) {
             return null;
         }
 

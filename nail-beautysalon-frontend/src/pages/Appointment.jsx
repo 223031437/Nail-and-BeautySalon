@@ -1,9 +1,11 @@
-import { useState } from 'react';
+
+import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { appointmentsApi } from '../api/appointments';
 import { Notice } from '../components/UIState';
 import { IconCalendar, IconCheck } from '../components/Icons';
 
-
+const API_URL = 'http://localhost:8080';
 
 const PROVINCES = [
   'Eastern Cape',
@@ -15,14 +17,6 @@ const PROVINCES = [
   'Northern Cape',
   'North West',
   'Western Cape',
-];
-
-const SERVICES = [
-  'Manicure',
-  'Pedicure',
-  'Gel Nails',
-  'Acrylic Nails',
-  'Nail Art',
 ];
 
 const emptyForm = () => ({
@@ -41,12 +35,69 @@ const generateAppointmentId = () =>
   `APT-${Date.now().toString(36).toUpperCase()}`;
 
 const BookAppointment = () => {
-  const [form, setForm] = useState(emptyForm());
+  const location = useLocation();
+  const selectedService = location.state?.service;
+
+  const [form, setForm] = useState(() => ({
+    ...emptyForm(),
+    serviceSelected: selectedService?.serviceName || '',
+  }));
+
+  const [services, setServices] = useState([]);
+  const [loadingServices, setLoadingServices] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState(null);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+  // Load services maintained by the backend.
+  useEffect(() => {
+    let active = true;
+
+    const fetchServices = async () => {
+      try {
+        const response = await fetch(`${API_URL}/service/getAll`);
+
+        if (!response.ok) {
+          throw new Error('Unable to load services. Please try again.');
+        }
+
+        const data = await response.json();
+
+        if (active) {
+          setServices(Array.isArray(data) ? data : []);
+        }
+      } catch (error) {
+        if (active) {
+          setResult({
+            ok: false,
+            message: error.message || 'Unable to load services.',
+          });
+        }
+      } finally {
+        if (active) {
+          setLoadingServices(false);
+        }
+      }
+    };
+
+    fetchServices();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // Preselect the service sent from ServiceDetails.
+  useEffect(() => {
+    if (selectedService?.serviceName) {
+      setForm((current) => ({
+        ...current,
+        serviceSelected: selectedService.serviceName,
+      }));
+    }
+  }, [selectedService?.serviceName]);
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
 
     setForm((current) => ({
       ...current,
@@ -54,8 +105,8 @@ const BookAppointment = () => {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
     if (submitting) return;
 
@@ -85,7 +136,7 @@ const BookAppointment = () => {
       return;
     }
 
-    if (!/^\d{4}$/.test(form.postalCode)) {
+    if (!/^\d{4}$/.test(form.postalCode.trim())) {
       setResult({
         ok: false,
         message: 'Please enter a valid 4-digit postal code.',
@@ -95,7 +146,10 @@ const BookAppointment = () => {
 
     const selectedDate = new Date(form.dateTime);
 
-    if (selectedDate <= new Date()) {
+    if (
+      Number.isNaN(selectedDate.getTime()) ||
+      selectedDate <= new Date()
+    ) {
       setResult({
         ok: false,
         message: 'Please select a future date and time.',
@@ -103,34 +157,32 @@ const BookAppointment = () => {
       return;
     }
 
-    setSubmitting(true);
-
-    const appointmentId = generateAppointmentId();
-
     const payload = {
-      appointmentId,
+      appointmentId: generateAppointmentId(),
       dateTime: form.dateTime,
       serviceSelected: form.serviceSelected,
-
       address: {
         streetNumber: form.streetNumber.trim(),
         streetName: form.streetName.trim(),
         suburb: form.suburb.trim(),
         city: form.city.trim(),
         province: form.province,
-        postalCode: form.postalCode,
+        postalCode: form.postalCode.trim(),
       },
-
       notes: form.notes.trim(),
       status: 'Pending',
     };
 
     try {
+      setSubmitting(true);
+
       await appointmentsApi.create(payload);
 
       setResult({
         ok: true,
-        message: `Booked! Your reference is ${appointmentId}. The studio will confirm your slot shortly.`,
+        message:
+          `Booked! Your reference is ${payload.appointmentId}. ` +
+          'The studio will confirm your appointment shortly.',
       });
 
       setForm(emptyForm());
@@ -151,11 +203,8 @@ const BookAppointment = () => {
   return (
     <section className="section form-page">
       <div className="container form-page__grid">
-
         <div className="form-page__intro">
-          <span className="eyebrow">
-            Reserve your slot
-          </span>
+          <span className="eyebrow">Reserve your slot</span>
 
           <h1>Book an appointment</h1>
 
@@ -179,7 +228,6 @@ const BookAppointment = () => {
           onSubmit={handleSubmit}
           noValidate
         >
-
           {result && (
             <Notice type={result.ok ? 'success' : 'error'}>
               <span
@@ -199,11 +247,8 @@ const BookAppointment = () => {
           )}
 
           <div className="form-row">
-
             <div className="field">
-              <label htmlFor="serviceSelected">
-                Service
-              </label>
+              <label htmlFor="serviceSelected">Service</label>
 
               <select
                 id="serviceSelected"
@@ -211,23 +256,47 @@ const BookAppointment = () => {
                 value={form.serviceSelected}
                 onChange={handleChange}
                 required
+                disabled={loadingServices}
               >
-                <option value="" disabled>
-                  Choose a service
+                <option value="">
+                  {loadingServices
+                    ? 'Loading services...'
+                    : 'Choose a service'}
                 </option>
 
-                {SERVICES.map((service) => (
-                  <option key={service} value={service}>
-                    {service}
+                {form.serviceSelected &&
+                  !services.some(
+                    (service) =>
+                      service.serviceName === form.serviceSelected
+                  ) && (
+                    <option value={form.serviceSelected}>
+                      {form.serviceSelected}
+                    </option>
+                  )}
+
+                {services.map((service) => (
+                  <option
+                    key={service.serviceId}
+                    value={service.serviceName}
+                  >
+                    {service.serviceName}
+                    {service.price != null
+                      ? ` — R${Number(service.price).toFixed(2)}`
+                      : ''}
                   </option>
                 ))}
               </select>
+
+              {!loadingServices && services.length === 0 && (
+                <small>
+                  Services could not be loaded. Check that the
+                  backend is running and has services available.
+                </small>
+              )}
             </div>
 
             <div className="field">
-              <label htmlFor="dateTime">
-                Date &amp; time
-              </label>
+              <label htmlFor="dateTime">Date &amp; time</label>
 
               <input
                 id="dateTime"
@@ -235,13 +304,10 @@ const BookAppointment = () => {
                 name="dateTime"
                 value={form.dateTime}
                 onChange={handleChange}
-                min={new Date()
-                  .toISOString()
-                  .slice(0, 16)}
+                min={getLocalDateTime()}
                 required
               />
             </div>
-
           </div>
 
           <p className="form-card__subhead">
@@ -249,16 +315,11 @@ const BookAppointment = () => {
           </p>
 
           <div className="form-row">
-
             <div className="field">
-              <label htmlFor="streetNumber">
-                Street number
-              </label>
-
+              <label htmlFor="streetNumber">Street number</label>
               <input
                 id="streetNumber"
                 name="streetNumber"
-                type="text"
                 value={form.streetNumber}
                 onChange={handleChange}
                 required
@@ -266,33 +327,23 @@ const BookAppointment = () => {
             </div>
 
             <div className="field">
-              <label htmlFor="streetName">
-                Street name
-              </label>
-
+              <label htmlFor="streetName">Street name</label>
               <input
                 id="streetName"
                 name="streetName"
-                type="text"
                 value={form.streetName}
                 onChange={handleChange}
                 required
               />
             </div>
-
           </div>
 
           <div className="form-row">
-
             <div className="field">
-              <label htmlFor="suburb">
-                Suburb
-              </label>
-
+              <label htmlFor="suburb">Suburb</label>
               <input
                 id="suburb"
                 name="suburb"
-                type="text"
                 value={form.suburb}
                 onChange={handleChange}
                 required
@@ -300,28 +351,20 @@ const BookAppointment = () => {
             </div>
 
             <div className="field">
-              <label htmlFor="city">
-                City
-              </label>
-
+              <label htmlFor="city">City</label>
               <input
                 id="city"
                 name="city"
-                type="text"
                 value={form.city}
                 onChange={handleChange}
                 required
               />
             </div>
-
           </div>
 
           <div className="form-row">
-
             <div className="field">
-              <label htmlFor="province">
-                Province
-              </label>
+              <label htmlFor="province">Province</label>
 
               <select
                 id="province"
@@ -330,9 +373,7 @@ const BookAppointment = () => {
                 onChange={handleChange}
                 required
               >
-                <option value="" disabled>
-                  Select a province
-                </option>
+                <option value="">Select a province</option>
 
                 {PROVINCES.map((province) => (
                   <option key={province} value={province}>
@@ -343,9 +384,7 @@ const BookAppointment = () => {
             </div>
 
             <div className="field">
-              <label htmlFor="postalCode">
-                Postal code
-              </label>
+              <label htmlFor="postalCode">Postal code</label>
 
               <input
                 id="postalCode"
@@ -359,7 +398,6 @@ const BookAppointment = () => {
                 required
               />
             </div>
-
           </div>
 
           <div className="field">
@@ -380,17 +418,20 @@ const BookAppointment = () => {
           <button
             className="btn btn-primary"
             type="submit"
-            disabled={submitting}
+            disabled={submitting || loadingServices}
           >
-            {submitting
-              ? 'Booking...'
-              : 'Request appointment'}
+            {submitting ? 'Booking...' : 'Request appointment'}
           </button>
-
         </form>
       </div>
     </section>
   );
 };
+
+function getLocalDateTime() {
+  const now = new Date();
+  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+  return now.toISOString().slice(0, 16);
+}
 
 export default BookAppointment;

@@ -47,4 +47,5 @@ public class EmployeeService implements IEmployeeService<Employee, String> {
         return this.repository.findAll();
     }
 
+    public List<Employee> findByEmail(String email){return this.repository.findByEmail(email);}
 }

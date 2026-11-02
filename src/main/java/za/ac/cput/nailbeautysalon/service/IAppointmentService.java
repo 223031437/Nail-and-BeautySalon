@@ -1,5 +1,6 @@
 package za.ac.cput.nailbeautysalon.service;
 
+import za.ac.cput.nailbeautysalon.domain.Address;
 import za.ac.cput.nailbeautysalon.domain.Appointment;
 
 import java.util.List;
@@ -20,4 +21,6 @@ public interface IAppointmentService <T,ID>{
     boolean delete(ID id);
 
     List<Appointment> getAll();
+    List<Appointment> findByAddress_City(String city);
+
 }

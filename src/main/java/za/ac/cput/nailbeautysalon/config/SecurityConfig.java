@@ -44,7 +44,7 @@ public class SecurityConfig {
                 // 1. SPECIFIC SECURE ROUTE (Must be BEFORE the general permitAll)
                 .requestMatchers("/auth/register-employee").hasAuthority("ROLE_ADMIN")
 
-                // 2. PUBLIC AUTH ROUTES (Everything else under /auth is open)
+                // 2. PUBLIC AUTH ROUTES
                 .requestMatchers("/auth/**").permitAll()
 
                 // 3. EVERYTHING ELSE REQUIRES A TOKEN

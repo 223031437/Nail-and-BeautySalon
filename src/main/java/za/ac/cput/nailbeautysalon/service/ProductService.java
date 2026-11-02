@@ -47,5 +47,7 @@ public class ProductService implements IProductService<Product, Integer> {
     public List<Product> getAll() {
         return this.repository.findAll();
     }
+    public List<Product> findByCategory(String category){ return this.repository.findByCategory(category);}
+
 }
 

@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.nailbeautysalon.domain.Service;
 import za.ac.cput.nailbeautysalon.service.ServiceService;
+import org.springframework.web.bind.annotation.CrossOrigin;
+
 
 import java.util.List;
 
@@ -14,6 +16,7 @@ import java.util.List;
  * ServiceController class for managing Service operations
  */
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/service")
 public class ServiceController {

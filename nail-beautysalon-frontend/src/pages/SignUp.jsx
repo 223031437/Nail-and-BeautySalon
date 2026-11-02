@@ -7,9 +7,13 @@ import { authService } from '../services/authService';
 
 function Signup() {
     const navigate = useNavigate();
+    
+    
     const [formData, setFormData] = useState({
         firstName: '', lastName: '', email: '', cellNumber: '', password: ''
     });
+    
+   
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
@@ -24,9 +28,10 @@ function Signup() {
 
         try {
             await authService.registerCustomer(formData);
+            
             navigate('/login', { state: { message: 'Account created! Please log in.' } });
         } catch (err) {
-            setError(err.response?.data?.message || 'Registration failed');
+            setError(err.response?.data?.message || 'Registration failed. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -41,28 +46,56 @@ function Signup() {
                     <p>Join us to book your next appointment.</p>
                 </div>
 
+                
                 {error && <Alert variant="danger">{error}</Alert>}
 
                 <Form onSubmit={handleSubmit}>
                     <div className="d-flex gap-3 mb-3">
                         <Form.Group className="w-50">
-                            <Form.Control name="firstName" placeholder="First Name" onChange={handleChange} required />
+                            <Form.Control 
+                                name="firstName" 
+                                placeholder="First Name" 
+                                onChange={handleChange} 
+                                required 
+                            />
                         </Form.Group>
                         <Form.Group className="w-50">
-                            <Form.Control name="lastName" placeholder="Last Name" onChange={handleChange} required />
+                            <Form.Control 
+                                name="lastName" 
+                                placeholder="Last Name" 
+                                onChange={handleChange} 
+                                required 
+                            />
                         </Form.Group>
                     </div>
 
                     <Form.Group className="mb-3">
-                        <Form.Control type="email" name="email" placeholder="Email address" onChange={handleChange} required />
+                        <Form.Control 
+                            type="email" 
+                            name="email" 
+                            placeholder="Email address" 
+                            onChange={handleChange} 
+                            required 
+                        />
                     </Form.Group>
 
                     <Form.Group className="mb-3">
-                        <Form.Control name="cellNumber" placeholder="Cell Number" onChange={handleChange} required />
+                        <Form.Control 
+                            name="cellNumber" 
+                            placeholder="Cell Number" 
+                            onChange={handleChange} 
+                            required 
+                        />
                     </Form.Group>
 
                     <Form.Group className="mb-4">
-                        <Form.Control type="password" name="password" placeholder="Password" onChange={handleChange} required />
+                        <Form.Control 
+                            type="password" 
+                            name="password" 
+                            placeholder="Password" 
+                            onChange={handleChange} 
+                            required 
+                        />
                     </Form.Group>
 
                     <div className="auth-button-wrapper">

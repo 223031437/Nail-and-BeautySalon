@@ -5,42 +5,14 @@ package za.ac.cput.nailbeautysalon.domain;
    Date: 22 June 2026 */
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
-import jakarta.persistence.Column;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinColumns;
 import jakarta.persistence.OneToOne;
 
 import java.time.LocalTime;
 
 @Entity
-@IdClass(AddressId.class)
 public class Contact {
-
     @Id
-    @Column(length = 20)
-    private String streetNumber;
-
-    @Id
-    @Column(length = 100)
-    private String streetName;
-
-    @Id
-    @Column(length = 80)
-    private String city;
-
-    @Id
-    @Column(length = 80)
-    private String suburb;
-
-    @Id
-    @Column(length = 60)
-    private String province;
-
-    @Id
-    @Column(length = 20)
-    private int postalCode;
-
+     private Long contactId;
     @OneToOne
     private Address address;
     private String phone;
@@ -50,20 +22,15 @@ public class Contact {
     protected Contact(){}
 
     public Contact(Builder builder){
+        this.contactId = builder.contactId;
         this.address = builder.address;
-
-        if (builder.address != null) {
-            this.streetNumber = builder.address.getStreetNumber();
-            this.streetName = builder.address.getStreetName();
-            this.city = builder.address.getCity();
-            this.suburb = builder.address.getSuburb();
-            this.province = builder.address.getProvince();
-            this.postalCode = builder.address.getPostalCode();
-        }
-
         this.hours = builder.hours;
         this.email = builder.email;
         this.phone = builder.phone;
+    }
+
+    public Long getContactId() {
+        return contactId;
     }
 
     public Address getAddress() {
@@ -85,18 +52,25 @@ public class Contact {
     @Override
     public String toString() {
         return "Contact{" +
-                "address=" + address +
-                ", phone=" + phone +
+                "contactId=" + contactId +
+                ", address=" + address +
+                ", phone='" + phone + '\'' +
                 ", email='" + email + '\'' +
                 ", hours=" + hours +
                 '}';
     }
 
     public static class Builder{
+        private Long contactId;
         private Address address;
         private String phone;
         private String email;
         private LocalTime hours;
+
+        public Builder setContactId(Long contactId) {
+            this.contactId = contactId;
+            return this;
+        }
 
         public Builder setAddress(Address address) {
             this.address = address;
@@ -119,6 +93,7 @@ public class Contact {
         }
 
         public Builder copy(Contact contact){
+            this.contactId = contact.contactId;
             this.address = contact.address;
             this.hours = contact.hours;
             this.email = contact.email;
