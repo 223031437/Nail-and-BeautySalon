@@ -15,6 +15,8 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import Product from './pages/Product';
 import Cart from './pages/Cart';
+import AdminOrders from './pages/AdminOrders';
+import MyOrders from './pages/MyOrders';
 import ServiceCatalogue from './pages/ServiceCatalogue.jsx';
 import ServiceManagement from './pages/ServiceManagement.jsx';
 
@@ -51,6 +53,8 @@ function App() {
                 <Route path="/cart" element={<Cart />}/>
                 <Route path="/services" element={<ServiceCatalogue />}/>
                 <Route path="/appointment" element={<BookAppointment />}/>
+                <Route path="/admin/orders" element={<AdminOrders />} />
+                <Route path="/my-orders" element={<MyOrders />} />
 
                 <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

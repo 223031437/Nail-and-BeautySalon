@@ -13,38 +13,34 @@ export function CartProvider({ children }) {
     });
 
     useEffect(() => {
-        try {
-            localStorage.setItem(KEY, JSON.stringify(cart));
-        } catch {
-            /* storage unavailable - the cart still works for this visit */
-        }
+        localStorage.setItem(KEY, JSON.stringify(cart));
     }, [cart]);
 
-    const quantityOf = (id) => cart.find((i) => i.id === id)?.quantity || 0;
+    const quantityOf = (productID) => cart.find((i) => i.productID === productID)?.quantity || 0;
 
-    /** Returns true when added, false when the stock limit stops it. */
     const addToCart = (product) => {
-        if (quantityOf(product.id) >= product.stock) return false;
+        if (quantityOf(product.productID) >= product.quantityInStock) return false;
         setCart((current) => {
-            const existing = current.find((i) => i.id === product.id);
+            const existing = current.find((i) => i.productID === product.productID);
             if (existing) {
-                return current.map((i) => (i.id === product.id ? { ...i, quantity: i.quantity + 1 } : i));
+                return current.map((i) => (i.productID === product.productID ? { ...i, quantity: i.quantity + 1 } : i));
             }
             return [...current, { ...product, quantity: 1 }];
         });
         return true;
     };
 
-    const changeQuantity = (id, amount) =>
+    const changeQuantity = (productID, amount) =>
         setCart((current) =>
             current.map((i) => {
-                if (i.id !== id) return i;
+                if (i.productID !== productID) return i;
                 const next = i.quantity + amount;
-                return next < 1 || next > i.stock ? i : { ...i, quantity: next };
+                // Ensure we don't exceed quantityInStock
+                return next < 1 || next > i.quantityInStock ? i : { ...i, quantity: next };
             })
         );
 
-    const removeItem = (id) => setCart((current) => current.filter((i) => i.id !== id));
+    const removeItem = (productID) => setCart((current) => current.filter((i) => i.productID !== productID));
     const clearCart = () => setCart([]);
 
     const cartCount = cart.reduce((sum, i) => sum + i.quantity, 0);
@@ -57,5 +53,4 @@ export function CartProvider({ children }) {
     );
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const useCart = () => useContext(CartContext);

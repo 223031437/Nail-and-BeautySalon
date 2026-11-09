@@ -32,7 +32,6 @@ public class ProductController {
         return service.create(validated(product));
     }
 
-    /** GET is the documented method; POST is kept for backwards compatibility. */
     @RequestMapping(value = "/read/{productID}", method = {RequestMethod.GET, RequestMethod.POST})
     public Product read(@PathVariable Integer productID) {
         Product product = service.read(productID);

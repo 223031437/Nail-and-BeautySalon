@@ -117,6 +117,10 @@ code {
     background-color: #fffaf7;
     padding: 18px 0;
     border-bottom: 1px solid #eee3dc;
+    position: sticky;
+    top: 0;
+    z-index: 9999; 
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05)
 }
 
 .brand-name {

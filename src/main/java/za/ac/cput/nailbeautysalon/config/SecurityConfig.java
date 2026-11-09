@@ -68,8 +68,10 @@ public class SecurityConfig {
 
                 // ---------- CUSTOMER ----------
                 .requestMatchers("/appointment/create", "/appointment/mine").hasAuthority(CUSTOMER)
+                .requestMatchers(HttpMethod.POST, "/order/create").hasAuthority(CUSTOMER)
+                .requestMatchers(HttpMethod.GET, "/order/mine").hasAuthority(CUSTOMER)
 
-                // ---------- ADMIN ONLY ----------
+                    // ---------- ADMIN ONLY ----------
                 .requestMatchers(HttpMethod.PUT, "/payment/*/status").hasAuthority(ADMIN)
                 .requestMatchers("/employee/create", "/employee/update", "/employee/delete/**").hasAuthority(ADMIN)
                 .requestMatchers("/appointment/delete/**").hasAuthority(ADMIN)
@@ -83,6 +85,9 @@ public class SecurityConfig {
                 .requestMatchers("/employee/**").hasAnyAuthority(ADMIN, EMPLOYEE)
                 .requestMatchers("/service/**", "/product/**").hasAnyAuthority(ADMIN, EMPLOYEE)
                 .requestMatchers("/customer/getAll", "/customer/create").hasAnyAuthority(ADMIN, EMPLOYEE)
+                .requestMatchers("/appointment/getAll", "/appointment/*/status").hasAnyAuthority(ADMIN, EMPLOYEE)
+                .requestMatchers(HttpMethod.GET, "/order/getAll").hasAnyAuthority(ADMIN, EMPLOYEE)
+                .requestMatchers(HttpMethod.PUT, "/order/**").hasAnyAuthority(ADMIN, EMPLOYEE)
 
                 // ---------- EVERYTHING ELSE NEEDS A LOGIN ----------
                 // (/appointment/{id}/reschedule|cancel, /appointment/read/**, /customer/read|update|delete

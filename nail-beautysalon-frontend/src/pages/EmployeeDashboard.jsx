@@ -35,6 +35,7 @@ function EmployeeDashboard({ admin = false }) {
 
     const cards = [
         { key: 'bookings', title: 'Bookings', body: 'View every booking, change a time slot or cancel.', cta: 'View Bookings' },
+        { key: 'orders', title: 'Product Orders', body: 'See what products customers have ordered for collection.', cta: 'View Orders', link: '/admin/orders' },
         { key: 'payments', title: 'Payments', body: 'See what has been paid and what is still pending.', cta: 'View Payments' },
         { key: 'messages', title: 'Messages', body: 'Answer messages from the Contact page by email or phone.', cta: 'View Messages' },
         { key: 'customers', title: 'Customers', body: 'Look up registered customers.', cta: 'View Customers' },
@@ -74,9 +75,15 @@ function EmployeeDashboard({ admin = false }) {
                                     <Card.Body>
                                         <h3>{card.title}</h3>
                                         <p>{card.body}</p>
-                                        <Button className="dashboard-button" onClick={() => setActiveTab(card.key)}>
-                                            {card.cta}
-                                        </Button>
+                                        {card.link ? (
+                                            <Button as={Link} to={card.link} className="dashboard-button">
+                                                {card.cta}
+                                            </Button>
+                                        ) : (
+                                            <Button className="dashboard-button" onClick={() => setActiveTab(card.key)}>
+                                                {card.cta}
+                                            </Button>
+                                        )}
                                     </Card.Body>
                                 </Card>
                             </Col>

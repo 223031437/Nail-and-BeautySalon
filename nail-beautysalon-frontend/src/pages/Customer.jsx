@@ -11,6 +11,7 @@ import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import { getCustomer, updateCustomer, deleteCustomer } from '../api/customerApi';
 import MyBookings from '../components/MyBookings';
+import MyOrders from './MyOrders';
 import FieldError from '../components/FieldError';
 import { hasErrors, required, validPhone } from '../utils';
 
@@ -19,6 +20,7 @@ const emptyForm = { userId: '', customerId: '', firstName: '', lastName: '', ema
 const TABS = [
     { key: 'overview', label: 'Overview' },
     { key: 'bookings', label: 'My Bookings' },
+    { key: 'orders', label: 'My Orders' },
     { key: 'profile', label: 'My Profile' },
     { key: 'account', label: 'Account' },
 ];
@@ -63,6 +65,7 @@ function Customer() {
 
                 {activeTab === 'overview' && <OverviewSection onNavigate={setActiveTab} />}
                 {activeTab === 'bookings' && <MyBookings />}
+                {activeTab === 'orders' && <MyOrders />}
                 {activeTab === 'profile' && <ProfileSection userId={user.userId} />}
                 {activeTab === 'account' && <AccountSection userId={user.userId} logout={logout} />}
 
@@ -74,6 +77,7 @@ function Customer() {
 function OverviewSection({ onNavigate }) {
     const cards = [
         { key: 'bookings', title: 'My Bookings', body: 'View, reschedule or cancel your appointments.', cta: 'View Bookings' },
+        { key: 'orders', title: 'My Orders', body: 'View your product orders and collection status.', cta: 'View Orders' },
         { key: 'profile', title: 'My Profile', body: 'View and update your personal details.', cta: 'View Profile' },
         { key: 'account', title: 'Account', body: 'Manage your account settings.', cta: 'Account Settings' },
     ];
